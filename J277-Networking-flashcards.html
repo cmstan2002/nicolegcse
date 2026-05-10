@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0E0D0B">
+<title>J277 Networking · Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --ink: #0E0D0B;
+    --card: #1A1815;
+    --card-elev: #211E1A;
+    --border: #2D2924;
+    --border-soft: #1F1C18;
+    --text: #ECE6D7;
+    --text-dim: #968F80;
+    --text-faint: #5A5448;
+    --accent: #D4A056;
+    --accent-bright: #E8B96A;
+    --accent-dim: rgba(212, 160, 86, 0.14);
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', Menlo, monospace;
+  }
+
+  html, body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(212, 160, 86, 0.07), transparent 55%),
+      radial-gradient(ellipse at 85% 100%, rgba(212, 160, 86, 0.04), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .app {
+    max-width: 640px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding:
+      max(16px, env(safe-area-inset-top))
+      16px
+      max(16px, env(safe-area-inset-bottom));
+  }
+
+  /* ─── Header ─── */
+  .header {
+    padding: 6px 4px 22px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .header-text { flex: 1; min-width: 0; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .title {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: -0.018em;
+    color: var(--text);
+  }
+
+  .title em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    letter-spacing: 0.005em;
+  }
+
+  .top-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+  }
+  .icon-btn:active {
+    transform: scale(0.92);
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+    transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    width: 0;
+  }
+
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-dim);
+    min-width: 54px;
+    text-align: right;
+    letter-spacing: 0.02em;
+  }
+
+  /* ─── Card area ─── */
+  .card-area {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 18px 0;
+    perspective: 1800px;
+    min-height: 0;
+  }
+
+  .card {
+    width: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(0.4, 0.15, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px 24px;
+    display: flex;
+    flex-direction: column;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.04) inset,
+      0 30px 60px -20px rgba(0,0,0,0.5),
+      0 8px 24px -8px rgba(0,0,0,0.3);
+  }
+
+  .face::-webkit-scrollbar { width: 0; display: none; }
+
+  .face.back {
+    transform: rotateY(180deg);
+    background: var(--card-elev);
+  }
+
+  /* Decorative corner mark on front */
+  .face.front::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 24px;
+    height: 24px;
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-top-right-radius: 12px;
+    pointer-events: none;
+  }
+  .face.back::before {
+    content: '';
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    width: 24px;
+    height: 24px;
+    border-bottom: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+    border-bottom-left-radius: 12px;
+    pointer-events: none;
+  }
+
+  /* Card meta */
+  .meta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 9px;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .chip.spec {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+  }
+
+  /* Front content */
+  .question {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 60, "SOFT" 30;
+    font-weight: 400;
+    font-size: 21px;
+    line-height: 1.32;
+    letter-spacing: -0.005em;
+    color: var(--text);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .question code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    background: rgba(212, 160, 86, 0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .question strong {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .question .blank {
+    display: inline-block;
+    min-width: 70px;
+    border-bottom: 2px solid var(--accent);
+    padding: 0 6px;
+    color: transparent;
+    margin: 0 2px;
+    line-height: 1;
+  }
+
+  /* Back content */
+  .answer {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .answer p { margin-bottom: 11px; }
+  .answer p:last-child { margin-bottom: 0; }
+
+  .answer strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .answer em {
+    font-style: italic;
+    color: var(--text-dim);
+  }
+
+  .answer ul, .answer ol {
+    margin: 6px 0 12px 20px;
+  }
+
+  .answer li {
+    margin-bottom: 5px;
+  }
+
+  .answer code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: rgba(255,255,255,0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent);
+    word-break: break-word;
+  }
+
+  .answer h4 {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 30;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 14px;
+    margin: 14px 0 5px;
+    color: var(--accent);
+    letter-spacing: 0.005em;
+  }
+
+  .answer h4:first-child { margin-top: 0; }
+
+  /* Tap hint */
+  .hint {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  /* ─── Controls ─── */
+  .controls {
+    padding: 18px 4px 4px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .btn {
+    flex: 1;
+    height: 52px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 13px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+    background: var(--border);
+  }
+
+  .btn:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+  }
+
+  .btn:disabled:active { transform: none; background: transparent; }
+
+  .btn.primary {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--accent);
+    flex: 1.5;
+  }
+
+  .btn.primary:active {
+    background: #BC8F4A;
+  }
+
+  .btn .arrow {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 400;
+  }
+
+  /* ─── Done state ─── */
+  .done {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+  }
+
+  .done.visible { display: flex; }
+
+  .done-eyebrow {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .done-title {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "SOFT" 100;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 42px;
+    line-height: 1.05;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+
+  .done-text {
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    max-width: 340px;
+  }
+
+  .done .btn {
+    flex: none;
+    padding: 0 32px;
+    max-width: 240px;
+  }
+
+  /* ─── Entrance ─── */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header { animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .card-area { animation: rise 0.5s 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .controls { animation: rise 0.5s 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+  /* Tighter on small phones */
+  @media (max-height: 700px) {
+    .question { font-size: 19px; }
+    .title { font-size: 26px; }
+    .face { padding: 22px 20px; }
+    .meta { margin-bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-row">
+      <div class="header-text">
+        <div class="eyebrow">OCR J277 · 1.3 + 1.4</div>
+        <h1 class="title">Networking <em>&amp;</em> Security</h1>
+        <div class="subtitle">25 cards · master, not memorise</div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="shuffle" aria-label="Shuffle">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+        </button>
+        <button class="icon-btn" id="restart" aria-label="Restart">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+      <div class="progress-label" id="counter">1 / 25</div>
+    </div>
+  </header>
+
+  <div class="card-area" id="cardArea">
+    <div class="card" id="card">
+      <div class="face front">
+        <div class="meta">
+          <span class="chip" id="typeChip">REASONING</span>
+          <span class="chip spec" id="specChip">1.3.1</span>
+        </div>
+        <div class="question" id="questionText"></div>
+        <div class="hint">Tap to reveal</div>
+      </div>
+      <div class="face back">
+        <div class="meta">
+          <span class="chip" id="typeChipBack">REASONING</span>
+          <span class="chip spec" id="specChipBack">1.3.1</span>
+        </div>
+        <div class="answer" id="answerText"></div>
+        <div class="hint">Tap to flip back</div>
+      </div>
+    </div>
+    <div class="done" id="done">
+      <div class="done-eyebrow">Deck complete</div>
+      <h2 class="done-title">25 down.</h2>
+      <p class="done-text">Spaced repetition only works if you come back tomorrow. Same time, same place.</p>
+      <button class="btn primary" id="restartFromDone">Start again</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev"><span class="arrow">←</span> Prev</button>
+    <button class="btn primary" id="flip">Flip card</button>
+    <button class="btn" id="next">Next <span class="arrow">→</span></button>
+  </div>
+</div>
+
+<script>
+const cards = [
+  {
+    type: "Reasoning",
+    spec: "1.3.1",
+    front: `Why does adding more devices to a Wi-Fi network slow everyone down, even when nobody's downloading anything?`,
+    back: `<p>Wireless bandwidth is <strong>shared</strong> across all devices on an access point — not dedicated per device.</p>
+<p>Every device sends background traffic (system updates, syncs, presence beacons), and the WAP can only transmit to one device at a time on a given channel (CSMA/CA). More devices = smaller time-slice each.</p>
+<p>Add interference, plus weaker signals from distant devices forcing slower data rates, and total throughput drops. <em>More devices = more contention = less for everyone.</em></p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.3.1",
+    front: `A small office has a star topology with 12 PCs connected to one switch. The switch fails. What happens — and what would have happened with a mesh topology instead?`,
+    back: `<h4>Star</h4>
+<p>Every PC loses network access. The switch is a <strong>single point of failure</strong> — kill the centre, lose the network.</p>
+<h4>Mesh</h4>
+<p>Each device has multiple paths to others; loss of one node only affects connections through it. The rest of the network keeps working.</p>
+<h4>Trade-off</h4>
+<p>Mesh is more resilient but expensive — far more cabling and links. Star is cheap and easy to manage but fragile. Most offices accept the fragility for the cost saving and add a backup switch.</p>`
+  },
+  {
+    type: "Compare",
+    spec: "1.3.1",
+    front: `Client–server vs peer-to-peer: when would a school choose each, and why?`,
+    back: `<h4>School → client–server</h4>
+<p>Centralised account management, file storage, and security policies. Easier backups, scalable to thousands of users, IT can enforce updates and permissions from one place.</p>
+<h4>Small home network → peer-to-peer</h4>
+<p>No server cost, simple setup, each device shares its own files directly with others. Fine for 2–4 devices, falls apart with 200.</p>
+<h4>Trade-off</h4>
+<p>Management overhead and cost (client–server) vs simplicity and limits (P2P). Schools have admin staff and need control — they'll always pick client–server.</p>`
+  },
+  {
+    type: "Connection",
+    spec: "1.3.1 + 1.3.2",
+    front: `Walk through what happens when Nicole types <code>bbc.co.uk</code> into her browser. Where do DNS and HTTP fit?`,
+    back: `<p><strong>1.</strong> Browser checks its local DNS cache for <code>bbc.co.uk</code>. Miss.</p>
+<p><strong>2.</strong> Asks the OS resolver, which queries DNS servers — root → <code>.uk</code> → <code>.co.uk</code> → BBC's authoritative nameserver. Returns an IP address.</p>
+<p><strong>3.</strong> Browser opens a <strong>TCP</strong> connection to that IP on port 443.</p>
+<p><strong>4.</strong> TLS handshake (for HTTPS), then sends an <strong>HTTP</strong> GET request.</p>
+<p><strong>5.</strong> Server responds with HTML; browser fetches CSS/JS/images via more HTTP requests; renders page.</p>
+<p><em>DNS resolves names to IPs. HTTP transfers content. They run sequentially, not simultaneously.</em></p>`
+  },
+  {
+    type: "Trace",
+    spec: "1.3.2",
+    front: `Trace what happens to a packet from your laptop to a web server, going down the four TCP/IP layers on the way out.`,
+    back: `<h4>Application</h4>
+<p>HTTP request created (e.g. <code>GET /index.html</code>).</p>
+<h4>Transport (TCP)</h4>
+<p>Wraps the HTTP message, adds source + destination port (e.g. 443), sequence number, splits into segments if large.</p>
+<h4>Internet (IP)</h4>
+<p>Wraps each segment, adds source + destination <strong>IP address</strong>, decides routing.</p>
+<h4>Link / Data</h4>
+<p>Wraps as a frame, adds source + destination <strong>MAC address</strong>, transmits as electrical pulses (Ethernet) or radio waves (Wi-Fi).</p>
+<p><em>At the server, layers unwrap in reverse — link strips MAC, IP strips routing, TCP reassembles segments, application reads the HTTP.</em></p>`
+  },
+  {
+    type: "Misconception",
+    spec: "1.3.2 + 1.4",
+    front: `Many students say "HTTPS encrypts the website." What's actually being encrypted, and what isn't?`,
+    back: `<h4>Encrypted</h4>
+<p>The data <em>in transit</em> between browser and server — request bodies, response content, cookies, headers, form data. Encrypted with TLS using a session key agreed during the handshake.</p>
+<h4>NOT encrypted</h4>
+<ul>
+<li>The destination IP address (visible to your ISP)</li>
+<li>The domain name during DNS lookup (and via SNI)</li>
+<li>Data once it's on the server — server can read everything</li>
+<li>Data once it's on your device — malware can read everything</li>
+</ul>
+<p><em>The site itself isn't "encrypted" — the connection is. HTTPS protects against eavesdropping in the middle, nothing else.</em></p>`
+  },
+  {
+    type: "Extended response · 8 marks",
+    spec: "1.3.1",
+    front: `Discuss the impact of cloud storage on individuals and businesses. <strong>(8 marks)</strong>`,
+    back: `<h4>Mark-scheme structure (point → explain → impact)</h4>
+<h4>Benefit · individuals</h4>
+<p>Access from anywhere on any device → files sync across phone/laptop without manual transfer → reduces risk of losing data if a device fails or is stolen.</p>
+<h4>Benefit · businesses</h4>
+<p>Pay-as-you-grow scaling → no upfront server hardware cost → enables remote and hybrid working, lowers barrier for startups.</p>
+<h4>Drawback · reliance on connectivity</h4>
+<p>No internet = no access → outages disrupt work → critical files should also exist offline.</p>
+<h4>Drawback · privacy &amp; jurisdiction</h4>
+<p>Third party holds your data → subject to their security and local laws → potential GDPR exposure if data crosses borders.</p>
+<h4>Conclusion</h4>
+<p>Net positive for most users, but creates dependency and privacy trade-offs that organisations must actively manage. <em>AOs hit: AO1 knowledge, AO2 application, AO3 evaluation.</em></p>`
+  },
+  {
+    type: "Reasoning",
+    spec: "1.3.2",
+    front: `Why does a wired Ethernet connection usually outperform Wi-Fi on the exact same internet plan?`,
+    back: `<p>The <strong>last leg</strong> — between device and router — is the bottleneck.</p>
+<h4>Wired Ethernet</h4>
+<p>Dedicated cable per device, no shared medium, no radio interference. Cat 6 supports 1 Gbps+, low latency, no contention.</p>
+<h4>Wi-Fi</h4>
+<p>Shared medium across all devices on the AP. Subject to interference (microwaves, neighbour networks, walls). Uses CSMA/CA — devices wait their turn before transmitting. Signal strength varies with distance, dropping data rate.</p>
+<p><em>Same ISP plan, same external internet — but the wireless leg can't keep up with what the cable side delivers.</em></p>`
+  },
+  {
+    type: "Cloze",
+    spec: "1.3.1 + 1.3.2",
+    front: `A {{router}} forwards data between different networks using {{IP}} addresses, while a {{switch}} forwards data within a single network using {{MAC}} addresses.`,
+    back: `<p>A <strong>router</strong> forwards data between different networks using <strong>IP</strong> addresses, while a <strong>switch</strong> forwards data within a single network using <strong>MAC</strong> addresses.</p>
+<p><em>Mnemonic: routers route between networks (IP = where on the internet), switches switch within a network (MAC = which device on this LAN).</em></p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.4",
+    front: `Nicole's grandparents are still using the Wi-Fi password they set up in 2010, on WEP encryption. Why is this a serious risk and what should they change?`,
+    back: `<h4>Why it's risky</h4>
+<p>WEP has been considered <strong>broken</strong> since the mid-2000s. Free tools can crack a WEP key in <em>minutes</em>, exposing all traffic on the network and giving attackers a foothold on the LAN.</p>
+<h4>What to change</h4>
+<ul>
+<li>Upgrade encryption to <strong>WPA2</strong> at minimum, <strong>WPA3</strong> if the router supports it</li>
+<li>Use a long passphrase (12+ characters)</li>
+<li>Rename the SSID away from the default to reduce targeted attacks</li>
+<li>Disable WPS (also exploitable)</li>
+</ul>
+<p><em>Encryption isn't just "on or off" — the algorithm matters. WEP off-the-shelf in 2010 isn't safe in 2026.</em></p>`
+  },
+  {
+    type: "Compare",
+    spec: "1.3.2",
+    front: `IPv4 vs IPv6: what problem does IPv6 solve, and why isn't it everywhere yet?`,
+    back: `<h4>The problem</h4>
+<p>IPv4 has <strong>32-bit addresses</strong> — about 4.3 billion possible. The explosion of internet-connected devices (phones, IoT, servers) exhausted them.</p>
+<h4>IPv6's solution</h4>
+<p><strong>128-bit addresses</strong> — effectively unlimited (2¹²⁸ addresses, more than there are atoms on Earth's surface).</p>
+<h4>Why not universal</h4>
+<ul>
+<li>Massive installed base of IPv4 hardware and software</li>
+<li>NAT extends IPv4's life by sharing one public IP across many private devices</li>
+<li>Gradual transition via "dual-stack" — running both at once</li>
+<li>Cost and inertia, not a technical limitation</li>
+</ul>`
+  },
+  {
+    type: "Connection",
+    spec: "1.3.2 + 1.4",
+    front: `How does a firewall use packet headers — which you also study under the network layer — to decide what to allow?`,
+    back: `<p>A firewall inspects each packet's headers, which come from the layered TCP/IP model:</p>
+<ul>
+<li><strong>Internet layer</strong> → source and destination <strong>IP address</strong></li>
+<li><strong>Transport layer</strong> → source and destination <strong>port number</strong></li>
+</ul>
+<p>Rules then say e.g. <em>"allow incoming TCP on port 443 (HTTPS), drop everything else from outside"</em>.</p>
+<h4>Stateful firewalls</h4>
+<p>Track which connections <em>you</em> initiated and only allow replies to those — so unsolicited traffic from outside gets dropped automatically.</p>
+<p><em>Without TCP/IP headers exposing source/destination/port, packet filtering wouldn't be possible. The layered model gives the firewall its fields to filter on.</em></p>`
+  },
+  {
+    type: "Trace",
+    spec: "1.4",
+    front: `Walk through what happens when a phishing email succeeds — from the moment the victim clicks the link to the attacker draining the account.`,
+    back: `<p><strong>1.</strong> Victim clicks link → browser opens a fake site mimicking the real one (e.g. fake bank login).</p>
+<p><strong>2.</strong> Victim enters username + password → POSTed to the attacker's server, not the bank.</p>
+<p><strong>3.</strong> Attacker stores credentials.</p>
+<p><strong>4.</strong> Attacker uses those credentials on the real site (often the same password is reused on other sites — credential stuffing).</p>
+<p><strong>5.</strong> Real bank sees a "valid" login from a normal-looking IP, grants access.</p>
+<p><strong>6.</strong> Attacker drains funds, changes recovery email/phone before victim notices.</p>
+<h4>Why it works</h4>
+<p>Exploits the <strong>human</strong>, not the system. Defences: user education + 2FA so a stolen password alone is useless.</p>`
+  },
+  {
+    type: "Reasoning",
+    spec: "1.4",
+    front: `Why does a brute-force attack become exponentially harder as password length increases by even one character?`,
+    back: `<p>For a charset of <em>n</em> possible characters, an <em>L</em>-length password has <strong>n<sup>L</sup></strong> possibilities. Each extra character <em>multiplies</em> the search space by <em>n</em>.</p>
+<h4>The numbers</h4>
+<p>With 95 printable characters:</p>
+<ul>
+<li>6-char → 95⁶ ≈ 7.4 × 10¹¹</li>
+<li>8-char → 95⁸ ≈ 6.6 × 10¹⁵ <em>(about 9000× harder)</em></li>
+<li>12-char → 95¹² ≈ 5.4 × 10²³</li>
+</ul>
+<p>Modern GPUs try billions of guesses per second. So a 6-char password falls in hours; a 12-char takes centuries.</p>
+<p><em>This is why length matters more than complexity. "Tr0ub4dor&amp;3" is weaker than "correct horse battery staple".</em></p>`
+  },
+  {
+    type: "Misconception",
+    spec: "1.4",
+    front: `"If I'm behind a firewall I'm safe from malware." What's wrong with this, and what does a firewall actually do?`,
+    back: `<h4>What a firewall does</h4>
+<p>Controls <strong>which network traffic enters and leaves</strong>, based on rules about IP, port, and protocol. It blocks unauthorised connections.</p>
+<h4>What it doesn't do</h4>
+<ul>
+<li>Doesn't inspect file <em>contents</em> for malicious code</li>
+<li>Doesn't stop you downloading malware via an <em>allowed</em> connection (e.g. HTTPS to a hostile site)</li>
+<li>Doesn't protect against social engineering — phishing emails come through normal email</li>
+<li>Doesn't help against malware on USB sticks</li>
+</ul>
+<h4>The right frame</h4>
+<p>Firewall = <strong>perimeter</strong>. Anti-malware = <strong>endpoint</strong>. You need both. Layered defence — each handles what the other can't.</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.4",
+    front: `A school's website becomes unreachable on results day. Logs show millions of requests per second from thousands of different IPs. What's happening, and what should the IT team do?`,
+    back: `<h4>Diagnosis</h4>
+<p><strong>Distributed Denial of Service (DDoS)</strong> — coordinated traffic from a botnet overwhelming the server. Distributed = many sources = harder to block by IP alone.</p>
+<h4>Immediate response</h4>
+<ul>
+<li>Enable DDoS mitigation / scrubbing service (Cloudflare, AWS Shield)</li>
+<li>Rate-limit requests per IP at the edge</li>
+<li>Move static content to a CDN to reduce origin load</li>
+<li>Block obviously malicious traffic patterns at the firewall</li>
+<li>Scale server capacity if architecture allows</li>
+</ul>
+<h4>Long-term</h4>
+<p>Keep mitigation always-on around predictable high-traffic events (results day, exam timetable release). Don't wait for the attack — attackers know the calendar too.</p>`
+  },
+  {
+    type: "Compare",
+    spec: "1.3.2 + 1.4",
+    front: `Symmetric vs asymmetric encryption: where does each get used in browsing an HTTPS site?`,
+    back: `<h4>Asymmetric (public/private key)</h4>
+<p>Used in the <strong>TLS handshake</strong>. Server's public key encrypts a session key the client sends; only the server's private key can decrypt it. <em>Slow but solves the key-exchange problem</em> — how do you agree a secret over a channel anyone can read?</p>
+<h4>Symmetric (single shared key)</h4>
+<p>Used for the <strong>actual data transfer</strong> afterwards. Both sides share the session key. <em>Fast and efficient</em> for ongoing traffic.</p>
+<h4>Why both?</h4>
+<p>Asymmetric is too slow for bulk data. Symmetric needs a shared secret to start. Real systems use asymmetric to safely <em>agree</em> a symmetric session key, then symmetric for everything that follows.</p>`
+  },
+  {
+    type: "Connection",
+    spec: "1.4",
+    front: `How do user access levels and physical security work together to protect a school's data?`,
+    back: `<h4>User access levels (logical)</h4>
+<p>Students see only their own files. Teachers see their classes. Admins see everything. Limits the blast radius if any one account is compromised.</p>
+<h4>Physical security</h4>
+<p>Locked server rooms, CCTV, no public access to network ports, secured Wi-Fi.</p>
+<h4>Why both matter</h4>
+<p>Each closes a different attack vector:</p>
+<ul>
+<li>Someone who walks in physically still can't plug into the network</li>
+<li>Someone who steals a student password still can't access admin data</li>
+<li>Someone who breaches one barrier still hits the next</li>
+</ul>
+<p><strong>Defence in depth</strong> — each layer fails independently. The attacker has to beat all of them; the school only has to win once.</p>`
+  },
+  {
+    type: "Reasoning",
+    spec: "1.4",
+    front: `Why is SQL injection still common decades after we knew how to prevent it?`,
+    back: `<p>It only works when user input is concatenated directly into SQL queries:</p>
+<p><code>"SELECT * FROM users WHERE name='" + input + "'"</code></p>
+<p>The fix — <strong>parameterised queries</strong> — has existed forever. They separate code from data so input can't change query structure.</p>
+<h4>Why it persists</h4>
+<ul>
+<li>Developers under deadline take shortcuts</li>
+<li>Old codebases haven't been refactored</li>
+<li>New developers learn from outdated tutorials</li>
+<li>Some frameworks make it easy to mix query and input</li>
+</ul>
+<p><em>It's not a tech problem — it's a process and training problem. The vulnerability is in human habits, not in any unfixable system flaw. That's why it's still on the OWASP Top 10.</em></p>`
+  },
+  {
+    type: "Cloze",
+    spec: "1.3.2",
+    front: `Common protocols: {{HTTP}} / HTTPS for web pages, {{FTP}} for transferring files, {{SMTP}} for sending email, and {{IMAP}} or POP for receiving email.`,
+    back: `<p><strong>HTTP</strong> / HTTPS for web pages, <strong>FTP</strong> for transferring files, <strong>SMTP</strong> for sending email, and <strong>IMAP</strong> or POP for receiving email.</p>
+<h4>Quick lookup</h4>
+<ul>
+<li><strong>HTTP / HTTPS</strong> — HyperText Transfer Protocol (Secure)</li>
+<li><strong>FTP</strong> — File Transfer Protocol</li>
+<li><strong>SMTP</strong> — Simple Mail Transfer Protocol (sending only)</li>
+<li><strong>POP</strong> — Post Office Protocol (downloads + deletes from server)</li>
+<li><strong>IMAP</strong> — Internet Message Access Protocol (keeps on server, syncs)</li>
+<li><strong>TCP / IP</strong> — Transmission Control / Internet Protocol</li>
+</ul>`
+  },
+  {
+    type: "Extended response · 8 marks",
+    spec: "1.4",
+    front: `Discuss the security threats faced by a small online retailer and how they should mitigate them. <strong>(8 marks)</strong>`,
+    back: `<h4>Threat · DDoS</h4>
+<p>Botnet floods the site → customers can't shop → revenue lost during peak times. <em>Mitigation:</em> CDN with DDoS protection.</p>
+<h4>Threat · SQL injection</h4>
+<p>Attacker submits malicious input in forms → dumps customer data including payment info → legal/reputational ruin under GDPR. <em>Mitigation:</em> parameterised queries, input validation, web application firewall.</p>
+<h4>Threat · phishing of staff</h4>
+<p>Attacker emails posing as a supplier → captures admin credentials → full system compromise. <em>Mitigation:</em> staff training + 2FA on all admin accounts.</p>
+<h4>Threat · brute force</h4>
+<p>Attacker tries common passwords on customer accounts → takes over accounts and orders goods → chargebacks and trust loss. <em>Mitigation:</em> rate limiting, account lockouts, password complexity rules.</p>
+<h4>Conclusion</h4>
+<p>Layered defence — technical controls plus staff training — because no single mitigation covers all four threat categories.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "1.3.2",
+    front: `"MAC addresses are unique forever and can't be changed." Where does this break down?`,
+    back: `<h4>The intent</h4>
+<p>MAC addresses are <em>designed</em> to be unique per network interface and burned into the NIC at manufacture. Largely they are.</p>
+<h4>The reality</h4>
+<p>Most operating systems can <strong>spoof</strong> a MAC in software:</p>
+<ul>
+<li>Linux: <code>ip link set dev eth0 address ...</code></li>
+<li>macOS and Windows (with drivers): same idea</li>
+<li>iPhones <em>randomise</em> their MAC on Wi-Fi scans for privacy</li>
+</ul>
+<p>Used legitimately for privacy, illegitimately for bypassing MAC-filter networks.</p>
+<h4>Implication</h4>
+<p>MAC addresses are useful for switching <em>within</em> a LAN, not as trustworthy identity. Don't build security around "this MAC = this person".</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.4",
+    front: `Nicole's friend says "I don't need anti-virus software, I only visit safe sites." Give three reasons this is risky.`,
+    back: `<h4>1. Drive-by downloads</h4>
+<p>Even legitimate sites get hacked, or serve compromised ads (<em>malvertising</em>). Just loading the page can trigger a download — no click required.</p>
+<h4>2. Files from elsewhere</h4>
+<p>USB sticks, email attachments, downloads from messaging apps, AirDropped files — none of those care about her browsing habits. Anti-malware scans them all on access.</p>
+<h4>3. Zero-day exploits</h4>
+<p>Vulnerabilities in her browser/OS that haven't been patched can be triggered by any page. Anti-malware (and timely updates) is the safety net.</p>
+<p><em>Bonus:</em> ransomware almost always arrives via email, not "unsafe" sites — and once it's running, browsing habits are irrelevant.</p>`
+  },
+  {
+    type: "Connection",
+    spec: "1.3.2 + 1.4",
+    front: `How does the layered TCP/IP model make penetration testing easier to organise?`,
+    back: `<p>Each layer has its own attack surface, so testers work through them <strong>systematically</strong>:</p>
+<h4>Application</h4>
+<p>SQL injection, cross-site scripting (XSS), broken authentication.</p>
+<h4>Transport</h4>
+<p>Port scanning, SYN floods, TCP session hijacking.</p>
+<h4>Internet</h4>
+<p>IP spoofing, ICMP attacks, routing manipulation.</p>
+<h4>Link</h4>
+<p>MAC spoofing, ARP poisoning, Wi-Fi cracking.</p>
+<p>A pen-test plan walks each layer, finds weaknesses, reports back.</p>
+<p><em>Without the layered model, "security testing" would be one undifferentiated blob. The model gives you a checklist.</em></p>`
+  },
+  {
+    type: "Reasoning",
+    spec: "1.3.1 + 1.4",
+    front: `Why does the same Wi-Fi network feel fast at 2am but unusable at 7pm?`,
+    back: `<p>Multiple compounding factors hit at peak hours:</p>
+<h4>1. Neighbour interference</h4>
+<p>Bandwidth shared with neighbours on overlapping channels. Peak hours = more devices = more interference.</p>
+<h4>2. Your own household demand</h4>
+<p>Streaming, gaming, video calls all peak in the evening. More internal contention for the AP.</p>
+<h4>3. ISP backbone congestion</h4>
+<p><strong>Contention ratio</strong> means your line shares capacity with others on the same exchange. Provider sells bandwidth assuming most don't max out simultaneously — at 7pm, they do.</p>
+<h4>4. Server-side load</h4>
+<p>Sites you're hitting (Netflix, BBC iPlayer) also slow under peak load.</p>
+<p><em>Same physical hardware. Very different effective throughput. The bottleneck moves around depending on time of day.</em></p>`
+  }
+];
+
+let currentIndex = 0;
+let order = cards.map((_, i) => i);
+
+const $ = id => document.getElementById(id);
+const cardEl = $('card');
+const doneEl = $('done');
+
+function renderCard() {
+  if (currentIndex >= order.length) {
+    cardEl.style.display = 'none';
+    doneEl.classList.add('visible');
+    $('flip').disabled = true;
+    $('next').disabled = true;
+    $('prev').disabled = false;
+    $('counter').textContent = `${order.length} / ${order.length}`;
+    $('progress').style.width = '100%';
+    return;
+  }
+
+  cardEl.style.display = '';
+  doneEl.classList.remove('visible');
+
+  const card = cards[order[currentIndex]];
+  cardEl.classList.remove('flipped');
+
+  $('typeChip').textContent = card.type.toUpperCase();
+  $('typeChipBack').textContent = card.type.toUpperCase();
+  $('specChip').textContent = card.spec;
+  $('specChipBack').textContent = card.spec;
+
+  // Cloze blanks: {{word}} → styled blank
+  const front = card.front.replace(/\{\{([^}]+)\}\}/g, '<span class="blank">$1</span>');
+  $('questionText').innerHTML = front;
+  $('answerText').innerHTML = card.back;
+
+  $('counter').textContent = `${currentIndex + 1} / ${order.length}`;
+  $('progress').style.width = `${((currentIndex + 1) / order.length) * 100}%`;
+
+  $('prev').disabled = currentIndex === 0;
+  $('flip').disabled = false;
+  $('next').disabled = false;
+  $('flip').textContent = 'Flip card';
+
+  // Reset scroll position on faces
+  document.querySelectorAll('.face').forEach(f => f.scrollTop = 0);
+}
+
+function flip() {
+  cardEl.classList.toggle('flipped');
+  $('flip').textContent = cardEl.classList.contains('flipped') ? 'Flip back' : 'Flip card';
+}
+
+function next() {
+  if (currentIndex < order.length) {
+    currentIndex++;
+    renderCard();
+  }
+}
+
+function prev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCard();
+  }
+}
+
+function shuffle() {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  currentIndex = 0;
+  renderCard();
+}
+
+function restart() {
+  order = cards.map((_, i) => i);
+  currentIndex = 0;
+  renderCard();
+}
+
+cardEl.addEventListener('click', flip);
+$('flip').addEventListener('click', (e) => { e.stopPropagation(); flip(); });
+$('next').addEventListener('click', next);
+$('prev').addEventListener('click', prev);
+$('shuffle').addEventListener('click', shuffle);
+$('restart').addEventListener('click', restart);
+$('restartFromDone').addEventListener('click', restart);
+
+// Swipe gestures
+let touchStartX = 0, touchStartY = 0;
+const cardArea = $('cardArea');
+cardArea.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+cardArea.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx > 0) prev();
+    else next();
+  }
+}, { passive: true });
+
+// Keyboard for desktop preview
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') prev();
+  else if (e.key === 'ArrowRight') next();
+  else if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    flip();
+  }
+});
+
+renderCard();
+</script>
+</body>
+</html>
