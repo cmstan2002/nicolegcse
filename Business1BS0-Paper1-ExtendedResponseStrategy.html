@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Extended Response Mastery &mdash; Edexcel 1BS0/01 Paper 1</title>
+<style>
+  /* ---------- Print setup ---------- */
+  @page { size: A4 portrait; margin: 14mm 12mm; }
+  @media print {
+    .toc, .doc-header { page-break-after: avoid; }
+    .er-section { page-break-before: always; }
+    .er-section:first-of-type { page-break-before: auto; }
+    .block, .q-card, .model-answer { page-break-inside: avoid; }
+    body { font-size: 9.5pt; line-height: 1.4; }
+  }
+
+  /* ---------- Base typography ---------- */
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1c1c1e;
+    line-height: 1.55;
+    font-size: 10.5pt;
+    background: #fafafb;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 18px 24px 60px; }
+
+  /* ---------- Doc header ---------- */
+  .doc-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #5b21b6 100%);
+    color: #fff;
+    padding: 26px 28px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+  }
+  .doc-header h1 { margin: 0 0 6px 0; font-size: 22pt; font-weight: 700; letter-spacing: -0.02em; }
+  .doc-header .sub { font-size: 11pt; opacity: 0.9; font-weight: 500; margin-bottom: 4px; }
+  .doc-header .meta { font-size: 9pt; opacity: 0.75; }
+
+  /* ---------- TOC ---------- */
+  .toc {
+    background: #fff;
+    border: 1px solid #e5e5ea;
+    border-radius: 8px;
+    padding: 14px 22px;
+    margin-bottom: 26px;
+  }
+  .toc-title { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b6b70; margin-bottom: 8px; }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin-bottom: 4px; font-size: 10.5pt; }
+  .toc a { color: #1e3a8a; text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+  .toc .toc-meta { font-size: 9pt; color: #6b6b70; margin-left: 6px; }
+
+  /* ---------- Section frame ---------- */
+  .er-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 28px;
+    border: 1px solid #e5e5ea;
+    overflow: hidden;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px;
+    color: #fff;
+  }
+  .section-header .num {
+    font-size: 28pt;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    min-width: 50px;
+  }
+  .section-header .title { font-size: 16pt; font-weight: 700; flex: 1; }
+  .section-header .meta { font-size: 9pt; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Section colours */
+  .er-section.t1 .section-header { background: #1e3a8a; }
+  .er-section.t2 .section-header { background: #166534; }
+  .er-section.t3 .section-header { background: #b45309; }
+  .er-section.t4 .section-header { background: #6b21a8; }
+
+  /* ---------- Blocks (the building blocks inside sections) ---------- */
+  .block { padding: 14px 22px; border-bottom: 1px solid #f0f0f3; }
+  .block:last-child { border-bottom: 0; }
+  .block .b-title {
+    font-size: 11pt;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #1c1c1e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .er-section.t1 .block .b-title { color: #1e3a8a; }
+  .er-section.t2 .block .b-title { color: #166534; }
+  .er-section.t3 .block .b-title { color: #b45309; }
+  .er-section.t4 .block .b-title { color: #6b21a8; }
+
+  .block p { margin: 0 0 10px 0; }
+  .block p:last-child { margin-bottom: 0; }
+  .block ul, .block ol { margin: 0 0 10px 18px; padding: 0; }
+  .block li { margin-bottom: 4px; }
+  .block strong { font-weight: 700; }
+  .block em { font-style: italic; }
+
+  /* Tip variants */
+  .block.tip {
+    background: #eff6ff;
+    border-left: 4px solid #1d4ed8;
+    border-radius: 0 8px 8px 0;
+    margin: 8px 22px;
+    padding: 12px 18px;
+    border-bottom: 0;
+  }
+  .block.tip.warning {
+    background: #fef2f2;
+    border-left-color: #b91c1c;
+  }
+  .block.tip.warning .b-title { color: #b91c1c; }
+  .block.tip.success {
+    background: #ecfdf5;
+    border-left-color: #047857;
+  }
+  .block.tip.success .b-title { color: #047857; }
+  .block.tip .b-title { color: #1d4ed8; }
+
+  /* Intro block — slight callout */
+  .block.intro { background: #f9fafb; }
+
+  /* Scoring block — light blue */
+  .block.scoring {
+    background: #f0f9ff;
+    border-left: 3px solid #0369a1;
+    margin: 8px 22px;
+    padding: 12px 18px;
+    border-radius: 0 6px 6px 0;
+    border-bottom: 0;
+  }
+  .block.scoring .b-title { color: #0369a1; font-size: 10pt; }
+
+  /* Structure block — neutral */
+  .block.structure { background: #fafafb; }
+
+  /* ---------- Template (code-style) ---------- */
+  .template, pre.template, pre {
+    background: #1c1c1e;
+    color: #f4f4f7;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 9pt;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin: 8px 0;
+  }
+
+  /* ---------- Q-card (exam question) ---------- */
+  .q-card {
+    background: #fff8db;
+    border: 1px solid #d4a015;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0 12px 0;
+  }
+  .q-card .q-meta {
+    font-size: 8.5pt;
+    color: #92500e;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .q-card .q-text { font-size: 10.5pt; font-style: italic; color: #1c1c1e; }
+  .q-card .q-text strong { font-style: normal; }
+
+  /* ---------- Model answer ---------- */
+  .model-answer {
+    background: #fffceb;
+    border: 1px solid #f7e08c;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0 12px 0;
+    font-size: 10pt;
+    line-height: 1.55;
+  }
+  .model-answer p { margin: 0 0 8px 0; }
+  .model-answer p:last-child { margin-bottom: 0; }
+
+  /* AO chips */
+  .ms-bullet {
+    display: inline-block;
+    background: #1c1c1e;
+    color: #fff;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 7.5pt;
+    font-weight: 700;
+    margin-right: 6px;
+    letter-spacing: 0.03em;
+    vertical-align: 1px;
+  }
+  /* Marks chip */
+  .marks {
+    display: inline-block;
+    background: #c79f1f;
+    color: #fff;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 8.5pt;
+    font-weight: 700;
+    margin-left: 4px;
+    vertical-align: 1px;
+  }
+
+  /* ---------- Tables ---------- */
+  table, table.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 9.5pt;
+  }
+  table.table th, table.table td, .block table th, .block table td {
+    border: 1px solid #d6d6db;
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.table th, .block table th {
+    background: #f4f4f7;
+    font-weight: 700;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  /* ---------- Footer ---------- */
+  .doc-footer {
+    margin-top: 24px;
+    padding: 18px 22px;
+    background: #f4f4f7;
+    border-radius: 8px;
+    font-size: 8.5pt;
+    color: #6b6b70;
+    line-height: 1.5;
+  }
+
+  /* ---------- Small screen ---------- */
+  @media (max-width: 640px) {
+    .container { padding: 12px 16px 40px; }
+    .doc-header { padding: 18px 18px; }
+    .doc-header h1 { font-size: 18pt; }
+    .section-header { padding: 12px 16px; }
+    .section-header .num { font-size: 22pt; min-width: 36px; }
+    .section-header .title { font-size: 13pt; }
+    .block, .block.intro, .block.structure { padding: 12px 16px; }
+    .block.tip, .block.scoring { margin: 8px 16px; padding: 10px 14px; }
+    .template, pre.template, pre { font-size: 8pt; padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="doc-header">
+  <h1>Extended Response Mastery</h1>
+  <div class="sub">Edexcel GCSE Business 1BS0/01 &mdash; Paper 1 (Investigating Small Business)</div>
+  <div class="meta">A guide to the 6-, 9- and 12-mark questions that decide your grade. For Nicole.</div>
+</header>
+
+<nav class="toc">
+  <div class="toc-title">In this guide</div>
+  <ol>
+    <li><a href="#strategy">Test-taking strategy</a> <span class="toc-meta">&mdash; time, command words, mark distribution, exam-day tactics</span></li>
+    <li><a href="#six-mark">6-mark Discuss &amp; Analyse</a> <span class="toc-meta">&mdash; Section A Q3(e) and Section B / C application questions</span></li>
+    <li><a href="#nine-mark">9-mark Justify</a> <span class="toc-meta">&mdash; one-sided defence of a chosen option</span></li>
+    <li><a href="#twelve-mark">12-mark Evaluate</a> <span class="toc-meta">&mdash; balanced analysis + contextual final judgement</span></li>
+  </ol>
+</nav>
+
+<section class="er-section t4" id="strategy">
+  <div class="section-header">
+    <div class="num">&starf;</div>
+    <div class="title">Test-taking strategy</div>
+    <div class="meta">extended responses on 1BS0/01</div>
+  </div>
+
+  <div class="block intro">
+    <div class="b-title">Why these questions decide your grade</div>
+    <p>Nicole &mdash; before we drill into the tactics, look at what the extended responses are actually worth. We audited <strong>every Paper&nbsp;1 series Pearson has released for 1BS0/01 between May&nbsp;2019 and August&nbsp;2024</strong> &mdash; that&apos;s twelve full papers. Every single one has the same shape: three 6-mark questions, two 9-mark questions and one 12-mark question.</p>
+    <table class="table">
+      <thead>
+        <tr><th>Series (1BS0/01)</th><th>6-mark Qs</th><th>9-mark Qs</th><th>12-mark Qs</th><th>ER total</th><th>% of 90</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>May 2019</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Aug 2019</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Nov 2020</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Feb 2021</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Nov 2021</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Feb 2022</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>May 2022</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Aug 2022</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>May 2023</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Aug 2023</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>May 2024</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+        <tr><td>Aug 2024</td><td>3 (=18)</td><td>2 (=18)</td><td>1 (=12)</td><td><strong>48</strong></td><td>53.3%</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Mean across all 12 series: 48 of 90 marks (53.3%) from extended responses. Zero structural variation.</strong> No series substitutes an extra 6-marker or drops the 12-marker, and no series alters the 18&thinsp;+&thinsp;18&thinsp;+&thinsp;12 split. (An earlier skills note said &ldquo;~45 of 90&rdquo;; that was mixing Paper&nbsp;1 and Paper&nbsp;2 data &mdash; the audit above is the real figure for 1BS0/01.)</p>
+    <p><strong>The questions also sit in the same positions every time:</strong> the three 6-markers are always Q3(e) in Section&nbsp;A (a <em>Discuss</em>), Q4(b) in Section&nbsp;B (an <em>Analyse</em>) and Q5(c) in Section&nbsp;B (an <em>Analyse</em>). The two 9-markers are always Q6(c) at the end of Section&nbsp;B (a <em>Justify</em> with two options) and Q7(d) in Section&nbsp;C (another <em>Justify</em>). The 12-mark <em>Evaluate</em> is invariably the final question, <strong>Q7(e)</strong>. Nicole can plan timings on a fixed question map and expect the 2025 paper to follow exactly the same shape.</p>
+    <p>Because the short answers in Sections&nbsp;A&ndash;C are mostly multiple-choice, calculation or 3-mark explain questions where most candidates score similarly, it is the 6-, 9- and 12-markers that pull a grade&nbsp;4 candidate up to a grade&nbsp;6, and a grade&nbsp;6 candidate up to a grade&nbsp;8. <em>Spend your revision time where the marks are.</em></p>
+  </div>
+
+  <div class="block tip">
+    <div class="b-title">Where to get the 2025 paper</div>
+    <p>The <strong>June 2025</strong> series (Paper 1 sat Monday 12 May 2025) has been examined and results issued, and the question paper, mark scheme and examiner report exist within Pearson&apos;s system. Pearson typically padlocks new papers for ~9 months after the exam (teacher / exams-officer access only via Edexcel Online); that window has just elapsed, so the June 2025 materials should now be transitioning to open download, but at time of checking they had not yet appeared on Pearson&apos;s public PDF dam. <strong>There is no August 2025 or November 2025 1BS0 resit</strong> &mdash; GCSE Business is not offered in the resit windows, so June 2025 is the only 2025 sitting.</p>
+    <p><strong>Routes to download:</strong></p>
+    <ul>
+      <li><a href="https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?Qualification-Family=GCSE&amp;Qualification-Subject=Business+(2017)">Pearson past-papers portal &mdash; filtered for GCSE Business 2017</a> (primary source; check the padlock icon; recent papers need Nicole&apos;s teacher to log in to Edexcel Online and download).</li>
+      <li><a href="https://qualifications.pearson.com/en/qualifications/edexcel-gcses/business-2017.coursematerials.html">Pearson 1BS0 course-materials page</a> &mdash; for any unlocked PDFs once promoted to open access.</li>
+      <li><a href="https://www.savemyexams.com/gcse/business/edexcel/past-papers/">Save My Exams &mdash; Edexcel GCSE Business past papers</a> (free secondary mirror; reliably mirrors Pearson papers once unlocked).</li>
+      <li><a href="https://revisionworld.com/gcse-revision/business-studies/business-studies-gcse-past-papers/edexcel-gcse-business-studies-past-papers">Revision World</a> (secondary mirror; at last check its most recent listing was June&nbsp;2024).</li>
+    </ul>
+    <p><strong>Structural changes for 2025?</strong> None announced. Pearson&apos;s news/policy feed and the GCSE Business assessment-support page describe no change to the 1BS0/01 specification or paper format for 2025. The specification remains the 2017 one; the paper remains 1h&nbsp;45min, 90 marks, three sections. The high-tariff distribution (3&times;6 + 2&times;9 + 1&times;12) has been stable through 2022, 2023 and 2024; the safest expectation is that it persists in 2025. (Note: a brand-new GCSE Business specification is in development at Pearson for first teaching from 2026 onwards under a different code &mdash; it does not affect the 2025 1BS0 paper Nicole will sit.) Once the June 2025 paper unlocks, download it via Nicole&apos;s teacher and re-run the audit to confirm.</p>
+  </div>
+
+  <div class="block structure">
+    <div class="b-title">Time management &mdash; 90 minutes for 90 marks</div>
+    <p>Paper&nbsp;1 is 90 minutes for 90 marks, so the baseline is <strong>one minute per mark</strong>. That is generous on the short-answer questions and tight on the 12-marker, so the trick is to bank time on the easy stuff and spend it on the long-answers.</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Question type</th>
+          <th>Marks</th>
+          <th>Target time</th>
+          <th>How that time breaks down</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Multiple choice</td><td>1</td><td>~30 sec</td><td>Read, pick, move on. Do not agonise.</td></tr>
+        <tr><td>Multiple choice / short</td><td>2</td><td>~1.5 min</td><td>Read, pick / write linked pair, move on.</td></tr>
+        <tr><td>Outline / Explain</td><td>3</td><td>~3 min</td><td>Straight to writing &mdash; no planning time.</td></tr>
+        <tr><td>Calculation</td><td>2&ndash;3</td><td>~2&ndash;3 min</td><td>Show your working: substitution = 1 mark, answer = 1 mark.</td></tr>
+        <tr><td><strong>Discuss / Analyse</strong></td><td><strong>6</strong></td><td><strong>~7 min</strong></td><td>1 min planning + 5 min writing + 1 min checking.</td></tr>
+        <tr><td><strong>Justify</strong></td><td><strong>9</strong></td><td><strong>~12 min</strong></td><td>2 min planning + 9 min writing + 1 min checking.</td></tr>
+        <tr><td><strong>Evaluate</strong></td><td><strong>12</strong></td><td><strong>~15 min</strong></td><td>3 min planning + 11 min writing + 1 min checking.</td></tr>
+      </tbody>
+    </table>
+    <p>The three extended-response slots eat about <strong>34 minutes</strong> in total. That leaves ~56 minutes for everything else &mdash; comfortably more than 1 minute per mark on the short answers, which is the bank you draw from if a 12-marker runs long.</p>
+    <p><strong>Tactical rule:</strong> never overrun on a 1-mark MCQ. If you are still staring at it after 60 seconds, pick the answer that feels closest, circle the question number to revisit at the end, and move on. Three minutes lost to a stubborn MCQ is three minutes stolen from your 12-marker &mdash; and those minutes are worth far more there.</p>
+  </div>
+
+  <div class="block structure">
+    <div class="b-title">Command-word decoder</div>
+    <p>The command word is the verb at the start of the question (&ldquo;Analyse&hellip;&rdquo;, &ldquo;Justify&hellip;&rdquo;, &ldquo;Evaluate&hellip;&rdquo;). It tells you <em>exactly</em> what kind of answer the examiner wants. Match it, and you tick the AO boxes automatically. Miss it, and even a brilliant answer caps at Level&nbsp;1.</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Command word</th>
+          <th>Typical marks</th>
+          <th>What the examiner wants</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>State / Give / Identify</strong></td><td>1</td><td>A single word or short phrase. No explanation. Do not over-write.</td></tr>
+        <tr><td><strong>Outline</strong></td><td>2</td><td>A point plus one linked development sentence. Two clear, joined ideas &mdash; not a list of two unrelated things.</td></tr>
+        <tr><td><strong>Explain / Describe</strong></td><td>3</td><td>Point + develop + impact. One chain of reasoning, three sentences is plenty.</td></tr>
+        <tr><td><strong>Analyse</strong></td><td>6</td><td>Build a chain of cause-and-effect: A leads to B, which leads to C, which means D for the business. <em>No final judgement.</em></td></tr>
+        <tr><td><strong>Discuss</strong></td><td>6</td><td>Look at <em>both</em> sides of the issue &mdash; an advantage and a drawback, or a for and an against &mdash; with analysis on each. A final position is welcome but optional.</td></tr>
+        <tr><td><strong>Justify</strong></td><td>9</td><td>Pick one option (you are usually given two) and <em>defend it</em>. One-sided argument, reasons backed by case-study evidence, ending in a clear judgement.</td></tr>
+        <tr><td><strong>Evaluate</strong></td><td>12</td><td>Balanced analysis (for + against), then a <em>contextual</em> final judgement weighing the factors. The conclusion must say which side wins and why, in this specific business.</td></tr>
+      </tbody>
+    </table>
+    <p>The command word is also a map of how marks are split. A 6-mark <em>Discuss</em> does not need a judgement &mdash; if you spend three sentences crafting one, you are sacrificing analysis marks for nothing. A 12-mark <em>Evaluate</em> without a judgement caps at Level&nbsp;2 (8 marks) however good the analysis is. <strong>Write for the verb.</strong></p>
+  </div>
+
+  <div class="block structure">
+    <div class="b-title">Reading the case study (the &ldquo;Item&rdquo;)</div>
+    <p>For Section&nbsp;B and Section&nbsp;C the case study sits on its own page &mdash; in the August&nbsp;2024 paper it was a customised-trainers business called <em>Adikoggz</em>; in August&nbsp;2023 it was a wind-farm cooperative called <em>Ripple</em>; in November&nbsp;2021 it was a barber shop called <em>That Feeling</em>. Every 6+ mark question in those sections must use the Item. Generic answers cap at Level&nbsp;1.</p>
+    <ul>
+      <li><strong>First pass:</strong> read the Item straight through, once, without highlighting. Get the shape of the business in your head &mdash; what it sells, who buys it, what makes it different.</li>
+      <li><strong>Second pass:</strong> read each question, then re-read the relevant paragraph of the Item. Most questions point you at a specific bit of the case study &mdash; a price, a percentage, a decision the owner is considering.</li>
+      <li><strong>Highlight as you go:</strong> circle numbers (&pound; figures, %, customer counts), dates, the owner&rsquo;s aims, recent decisions and named competitors. Those are your AO2 evidence ammunition.</li>
+      <li><strong>Note the business name and use it.</strong> &ldquo;Adikoggz&rdquo; and &ldquo;Keilan&rdquo; (the owner) in every paragraph of every extended response &mdash; never &ldquo;the business&rdquo;.</li>
+    </ul>
+  </div>
+
+  <div class="block tip success">
+    <div class="b-title">Mark-grabbing tactics &mdash; high reward, low effort</div>
+    <ul>
+      <li><strong>Always name the business.</strong> In an extended response, write &ldquo;<em>Adikoggz</em>&hellip;&rdquo; not &ldquo;the business&hellip;&rdquo;. Examiners are explicitly looking for application markers and a name is the cheapest one available.</li>
+      <li><strong>Use signpost connectives</strong> &mdash; &ldquo;This means&hellip;&rdquo;, &ldquo;Therefore&hellip;&rdquo;, &ldquo;As a result&hellip;&rdquo;, &ldquo;Which is bad/good for the business because&hellip;&rdquo;. They visually signal a chain of reasoning to the examiner.</li>
+      <li><strong>Finish every PEEL paragraph with a Link sentence</strong> that ties the point back to <em>this specific</em> business&rsquo;s situation. Generic finishes lose AO2.</li>
+      <li><strong>On 9-markers, pick a side in the first sentence.</strong> &ldquo;The better option for <em>Adikoggz</em> is&nbsp;X because&hellip;&rdquo; The examiner now knows they are reading a one-sided justification, which is exactly what the command word demands.</li>
+      <li><strong>On 12-markers, finish with &ldquo;It depends on&hellip;&rdquo;</strong> + two factors + a final verdict. For example: &ldquo;Ultimately it depends on (1)&nbsp;how price-sensitive the customers are and (2)&nbsp;whether the brand can compete on quality. Given that <em>Adikoggz</em>&apos;s customers are paying &pound;20 for customisation, they value uniqueness over price, so&hellip;&rdquo;</li>
+      <li><strong>Quote at least one number or named fact</strong> from the case study in every paragraph: &ldquo;the &pound;39 monthly membership&rdquo;, &ldquo;the &pound;19 competitor price&rdquo;, &ldquo;the 38.46% figure&rdquo;. Numbers shout AO2.</li>
+      <li><strong>Depth beats breadth.</strong> One point developed through five sentences of cause-and-effect outscores three shallow points. The mark schemes reward &ldquo;detailed interconnected points with logical chains of reasoning&rdquo; &mdash; that means <em>long</em> chains, not <em>many</em> points.</li>
+    </ul>
+  </div>
+
+  <div class="block tip warning">
+    <div class="b-title">Common pitfalls &mdash; how candidates throw marks away</div>
+    <ul>
+      <li><strong>Writing a balanced essay on a 9-mark Justify.</strong> If you give equal weight to both options, the examiner reads it as &ldquo;Discuss&rdquo; and you cap at Level&nbsp;1/2. Pick a side and defend it.</li>
+      <li><strong>Forgetting to apply to the named business.</strong> If your answer would work for any business in any industry, you have lost AO2 entirely &mdash; and AO2 is roughly a third of every extended-response question.</li>
+      <li><strong>Strong analysis but no judgement on a 12-marker.</strong> A wall of brilliant analysis without a &ldquo;therefore, the better choice is&hellip;&rdquo; caps at Level&nbsp;2 (8 of 12). Always finish with a verdict.</li>
+      <li><strong>Memorising templates so rigidly the answer feels stitched together.</strong> Examiner reports mention this every year. PEEL and BUDS are scaffolds, not scripts.</li>
+      <li><strong>Spending 25 minutes on the 12-marker</strong> and then running out of time for the calculations and 3-markers at the start. The 12-marker is worth 12 marks. The eight minutes you stole from Section&nbsp;A could have been twelve easy marks.</li>
+      <li><strong>Treating &ldquo;Discuss&rdquo; like &ldquo;Evaluate&rdquo;.</strong> A 6-mark Discuss does not need a graded judgement &mdash; if you write one, you are stealing time from a second analysis chain that would have actually scored.</li>
+      <li><strong>Listing instead of linking on a 2-mark Outline.</strong> Two unrelated points score 1, not 2. The marks are for the <em>link</em>.</li>
+    </ul>
+  </div>
+
+  <div class="block tip success">
+    <div class="b-title">Exam-day check-list &mdash; the final 60-second mental run-through</div>
+    <ul>
+      <li><strong>Bring two pens</strong> (one fails) and a watch or quiet timer &mdash; do not rely on the wall clock alone.</li>
+      <li><strong>First 60 seconds of the exam:</strong> flick to the back of the paper and find the 12-marker. Read the question. Now your subconscious is working on it while you do Section&nbsp;A.</li>
+      <li><strong>Before every extended response,</strong> sketch a tiny bullet plan in the margin &mdash; one minute, three bullets, done. Then write.</li>
+      <li><strong>Every paragraph in 6/9/12-mark answers:</strong> name the business, quote a number or fact from the Item, finish with a link sentence.</li>
+      <li><strong>Save the last five minutes</strong> for the 12-marker&rsquo;s conclusion (&ldquo;It depends on&hellip;&rdquo;) and a sanity check on the calculations &mdash; transposing a digit on a 3-mark sum is the cheapest mark you can lose.</li>
+      <li><strong>If you finish early</strong> &mdash; you should not, but if you do &mdash; go back to the 12-marker and add one more development sentence to your weakest paragraph. Never sit and stare.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="er-section t1" id="six-mark">
+  <div class="section-header">
+    <div class="num">6</div>
+    <div class="title">6-mark Discuss / Analyse questions</div>
+    <div class="meta">mark question</div>
+  </div>
+
+  <div class="block intro">
+    <div class="b-title">What this question looks like on Paper 1</div>
+    <p>Nicole, the 6-mark extended response shows up in <strong>two different places</strong> on Paper 1 (1BS0/01), and the version you get changes how you have to answer it:</p>
+    <ul>
+      <li><strong>Section A &mdash; Q3(e):</strong> a generic 6-marker with <em>no</em> case study. The command word is usually <strong>Discuss</strong>. Marks split <strong>3 AO1b</strong> (knowledge &amp; understanding) plus <strong>3 AO3a</strong> (analysis &mdash; chains of reasoning). No business is named, so you talk about &ldquo;a small business&rdquo; in general.</li>
+      <li><strong>Section B / Section C &mdash; typically Q4(b), Q4(c), Q5(b) or Q5(c):</strong> a case-study-tied 6-marker. The command word is usually <strong>Analyse</strong>. Marks split <strong>3 AO2</strong> (application to the named business) plus <strong>3 AO3a</strong> (analysis). The italicised business name in the question is the giveaway &ndash; you <em>must</em> apply to that business in every paragraph.</li>
+    </ul>
+    <p>A 6-marker is roughly <strong>two short PEEL paragraphs</strong>, or <strong>one fully-developed PEEL</strong> with two chains of reasoning. There is <em>no</em> conclusion needed and <em>no</em> evaluation (AO3b) being tested &mdash; do not waste time writing &ldquo;Overall, I think&hellip;&rdquo;. Aim for around <strong>6&ndash;8 minutes</strong> on this question.</p>
+  </div>
+
+  <div class="block structure">
+    <div class="b-title">Structure &mdash; the template to memorise</div>
+    <p>Use two PEEL paragraphs. Each PEEL is: <strong>P</strong>oint &middot; <strong>E</strong>xplain (or Evidence from the extract) &middot; <strong>E</strong>xpand (chain of reasoning &mdash; &ldquo;this means&hellip; therefore&hellip; as a result&hellip;&rdquo;) &middot; <strong>L</strong>ink back to the question.</p>
+    <pre class="template">[Optional one-line opener naming the topic / business.]
+
+PEEL 1 (positive or first impact)
+P  &mdash; One impact is that&hellip;
+E  &mdash; This is because&hellip;  (Section B/C: quote / paraphrase the extract here)
+E  &mdash; This means&hellip; therefore&hellip; as a result&hellip;
+L  &mdash; So the impact on [the business] is&hellip;
+
+PEEL 2 (negative or second impact)
+P  &mdash; However, another impact is&hellip;
+E  &mdash; This is because&hellip;  (Section B/C: quote / paraphrase again)
+E  &mdash; This means&hellip; therefore&hellip; as a result&hellip;
+L  &mdash; So the impact on [the business] is&hellip;</pre>
+    <p><strong>Section A vs Section B/C &mdash; the key difference:</strong></p>
+    <ul>
+      <li><strong>Section A (Q3e):</strong> no business named, no extract. Talk about &ldquo;a small business&rdquo; in generic chains. Examiners want clean cause-and-effect reasoning. Picking <em>both</em> a positive and a negative impact suits the word &ldquo;Discuss&rdquo; well.</li>
+      <li><strong>Section B/C:</strong> the italicised business name (e.g. <em>Sports Tours Ltd</em>) tells you that <strong>AO2 is being tested</strong>. If you write a generic answer with no reference to the extract, the examiner&rsquo;s report says you are capped at <strong>3 out of 6</strong>. Use specific details from the extract (products, customers, location, prices) in <em>every</em> paragraph.</li>
+    </ul>
+  </div>
+
+  <div class="block example">
+    <div class="b-title">Worked example 1 &mdash; Section A &ldquo;Discuss&rdquo;</div>
+    <div class="q-card">
+      <div class="q-meta">Edexcel 1BS0/01, November 2021, Q3(e)</div>
+      <div class="q-text">&ldquo;Discuss the impact on a small business from the introduction of new employment laws.&rdquo; <span class="marks">6 marks</span></div>
+    </div>
+    <div class="model-answer">
+      <p>New employment laws cover areas such as the minimum wage, working hours and health-and-safety rules that a small business must legally follow. <span class="ms-bullet">AO1b</span></p>
+
+      <p>One impact is that new employment laws can <strong>increase the running costs</strong> of a small business. <span class="ms-bullet">AO1b</span> If the law raises the National Minimum Wage, the business has to pay every member of staff at least the new hourly rate. <span class="ms-bullet">AO1b</span> This means the total wage bill rises each month, which therefore eats into the profit margin on every product sold, and as a result the owner may have to put prices up or cut staff hours to stay profitable. <span class="ms-bullet">AO3a</span></p>
+
+      <p>However, a positive impact is that new employment laws can <strong>improve staff motivation and retention</strong>. <span class="ms-bullet">AO1b</span> Laws that protect rest breaks, holiday pay or safer working conditions make employees feel fairly treated. <span class="ms-bullet">AO1b</span> Happier employees are less likely to leave, therefore the business spends less money on recruiting and training replacements, and as a result productivity and customer service can improve over time. <span class="ms-bullet">AO3a</span></p>
+    </div>
+    <div class="block scoring">
+      <div class="b-title">Why this scores 6/6</div>
+      <ul>
+        <li><strong>AO1b (knowledge):</strong> shows clear understanding of what employment laws actually are (minimum wage, hours, health and safety) &mdash; not just the word &ldquo;laws&rdquo;.</li>
+        <li><strong>AO3a (analysis):</strong> each paragraph has a proper chain &mdash; &ldquo;<em>this means&hellip; therefore&hellip; as a result</em>&rdquo; &mdash; linking the law to costs/prices and to motivation/retention.</li>
+        <li><strong>Discuss</strong> command word handled: one negative impact <em>and</em> one positive impact, which is exactly what &ldquo;Discuss&rdquo; invites.</li>
+        <li>No wasted words on a conclusion &mdash; AO3b is not tested here, so writing &ldquo;In conclusion&hellip;&rdquo; would gain zero extra marks.</li>
+        <li>Uses linking words (<em>therefore</em>, <em>as a result</em>, <em>this means</em>) which the principal examiner specifically asks for in the November 2021 report.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block example">
+    <div class="b-title">Worked example 2 &mdash; Section B &ldquo;Analyse&rdquo; (case study)</div>
+    <div class="q-card">
+      <div class="q-meta">Edexcel 1BS0/01, November 2021, Q4(b) &mdash; <em>Sports Tours Ltd</em> case study</div>
+      <div class="q-text">&ldquo;Analyse the impact of the internet on the location of <em>Sports Tours Ltd</em>&rsquo;s premises.&rdquo; <span class="marks">6 marks</span></div>
+    </div>
+    <p><em>Reminder of the extract:</em> <em>Sports Tours Ltd</em> is &ldquo;one of the leading online specialist sports tour operators&rdquo; arranging tours for sports teams in the UK and Europe.</p>
+    <div class="model-answer">
+      <p>Because <em>Sports Tours Ltd</em> is an <strong>online</strong> tour operator, the internet means it does <em>not</em> need a high-street retail location. <span class="ms-bullet">AO2</span> Customers (sports teams) book tours through the website rather than walking into a shop. <span class="ms-bullet">AO2</span> This means the business can locate its premises in a cheaper area such as an industrial estate or even a small office, therefore fixed costs such as rent and business rates will be much lower, and as a result <em>Sports Tours Ltd</em> needs to sell fewer tours to break even. <span class="ms-bullet">AO3a</span></p>
+
+      <p>In addition, the internet allows <em>Sports Tours Ltd</em> to reach customers <strong>across the UK and Europe</strong> without needing to be near them. <span class="ms-bullet">AO2</span> Sports teams in different cities can compare destinations, prices and reviews online from their own clubhouse. <span class="ms-bullet">AO2</span> This means location is no longer about being near the customer base, therefore <em>Sports Tours Ltd</em> can choose premises close to good transport links to airports or to its suppliers (hotels, coaches), and as a result the business can serve a much wider market while keeping operating costs down. <span class="ms-bullet">AO3a</span></p>
+    </div>
+    <div class="block scoring">
+      <div class="b-title">Why this scores 6/6</div>
+      <ul>
+        <li><strong>AO2 (application):</strong> the answer is anchored to <em>Sports Tours Ltd</em> in <strong>every</strong> paragraph &mdash; not just the name dropped in, but specific details (&ldquo;online tour operator&rdquo;, &ldquo;sports teams&rdquo;, &ldquo;UK and Europe&rdquo;) lifted from the extract.</li>
+        <li><strong>AO3a (analysis):</strong> two clear chains &mdash; cheaper premises &rarr; lower fixed costs &rarr; lower break-even; and wider reach &rarr; location near transport &rarr; lower operating costs.</li>
+        <li>Tackles the exact topic: <strong>impact of the internet on location</strong> &mdash; not generic location factors and not a generic essay on e-commerce. The November 2021 examiners&rsquo; report flags this as the main thing students got wrong.</li>
+        <li>Two distinct impacts (cost of premises; reach &amp; choice of premises) rather than the same point written twice.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block tip warning">
+    <div class="b-title">Common pitfalls &mdash; how 6-markers lose marks</div>
+    <ul>
+      <li><strong>Skipping the Link / second step of analysis.</strong> Writing &ldquo;Costs will increase. This will make things more expensive&rdquo; is the <em>same point</em> said twice &mdash; it scores AO1 only, not AO3a. You need a fresh consequence: &ldquo;therefore profit margins fall, so the owner may have to cut staff hours.&rdquo;</li>
+      <li><strong>Section B/C: not applying to the named business.</strong> If the business name is in italics in the question, AO2 is being tested. A generic answer is capped at <strong>3/6</strong>. Quote or paraphrase the extract in every paragraph &mdash; the products it sells, where it is, who its customers are.</li>
+      <li><strong>Writing 5 shallow points instead of 2 deep ones.</strong> The examiner is looking for <em>chains of reasoning</em>, not a list. Two well-developed PEELs beat five one-liners every time.</li>
+      <li><strong>Ignoring the command word.</strong> &ldquo;<strong>Discuss</strong>&rdquo; invites both sides &mdash; positive and negative. &ldquo;<strong>Analyse</strong>&rdquo; just wants you to build chains of cause and effect (it can be all on one side). Read the command word before you plan.</li>
+      <li><strong>Writing a conclusion you don&rsquo;t need.</strong> 6-markers do not test AO3b (evaluation). Save conclusions for the 9- and 12-markers &mdash; here they waste time.</li>
+      <li><strong>Vague verbs.</strong> &ldquo;It will be bad&rdquo; or &ldquo;things will get worse&rdquo; show no understanding. Use precise business terms: <em>fixed costs, break-even, profit margin, cash flow, market share, motivation, retention</em>.</li>
+    </ul>
+  </div>
+
+  <div class="block tip success">
+    <div class="b-title">Nicole&rsquo;s quick checklist before you move on</div>
+    <ul>
+      <li>Did I write <strong>two</strong> paragraphs (or one big one with two chains)?</li>
+      <li>Did I use linking words &mdash; <em>because</em>, <em>therefore</em>, <em>this means</em>, <em>as a result</em> &mdash; at least twice?</li>
+      <li>If a business is <em>named in italics</em>, did I mention specific extract details in <strong>every</strong> paragraph?</li>
+      <li>If it&rsquo;s &ldquo;Discuss&rdquo;, did I cover a positive <em>and</em> a negative impact?</li>
+      <li>Did I resist writing a conclusion? (6-markers don&rsquo;t need one.)</li>
+    </ul>
+  </div>
+</section>
+
+<section class="er-section t2" id="nine-mark">
+  <div class="section-header">
+    <div class="num">9</div>
+    <div class="title">Justify questions</div>
+    <div class="meta">mark question</div>
+  </div>
+
+  <div class="block intro">
+    <div class="b-title">What this question is</div>
+    <p>Nicole, the 9-mark <strong>Justify</strong> is the headline question of <strong>Section B</strong> on Paper 1 &mdash; it almost always sits as <strong>Q6(c)</strong>, the last question before you move into Section C. You are shown a named small business and given two clearly labelled options (<em>Option 1</em> and <em>Option 2</em>). The command is always: <em>&ldquo;Justify which one of these two options&hellip;&rdquo;</em></p>
+    <p><strong>Justify is a ONE-SIDED question.</strong> You pick ONE option in the very first sentence and you defend that option for the rest of the answer. You do <strong>not</strong> write a balanced essay weighing both options against each other &mdash; that is what the 12-mark <em>Evaluate</em> in Section C is for. Examiners will cap a balanced answer at Level 1 or low Level 2, no matter how long it is.</p>
+    <p>The 9 marks are split: <span class="ms-bullet">AO2</span> 3 marks for <strong>application</strong> to the named business &middot; <span class="ms-bullet">AO3a</span> 3 marks for <strong>analysis</strong> (chains of reasoning) &middot; <span class="ms-bullet">AO3b</span> 3 marks for <strong>judgement</strong> (a justified decision tied to the business&rsquo;s context). There are no AO1 marks here &mdash; you do not need to define terms, you need to <em>use</em> them.</p>
+  </div>
+
+  <div class="block structure">
+    <div class="b-title">The four-part Justify structure</div>
+    <p>Every Level 3 Justify answer follows the same four moves. Drill this into your head:</p>
+    <ol>
+      <li><strong>Choice sentence</strong> &ndash; pick your option in sentence one. No throat-clearing, no introductions. <em>&ldquo;I would recommend Option X for [business] because&hellip;&rdquo;</em></li>
+      <li><strong>Developed PEEL for the chosen option</strong> &ndash; 4&ndash;5 sentences of <em>Point &rarr; Evidence from extract &rarr; Explain &rarr; Link to business aim</em>. This is where you build a chain of reasoning: <em>because&hellip;therefore&hellip;which means&hellip;so that&hellip;</em>. Use the business name and at least two specific facts from the source.</li>
+      <li><strong>One-sentence rejection of the other option</strong> &ndash; a single applied weakness of the rejected option, written so it <em>strengthens your choice</em>. This is NOT a balanced paragraph &mdash; one sentence only.</li>
+      <li><strong>Contextual conclusion</strong> &ndash; finish with <em>&ldquo;Overall, Option X best supports [business]&rsquo;s aim of&hellip;because&hellip;&rdquo;</em> Tie the judgement back to the business&rsquo;s specific situation (its size, its customers, its cash flow, Nicole &mdash; whatever the extract told you).</li>
+    </ol>
+    <pre class="template">[Choice]   I would recommend Option X for [Business] because [headline reason].
+
+[PEEL]     This is because [point]. The extract states that [evidence],
+           which means [explain]. Therefore [chain &mdash; "so&hellip;which means&hellip;"].
+           As a result, [link to a business aim such as profit / survival /
+           growth / cash flow].
+
+[Reject]   Although Option Y could [brief benefit], it would not suit
+           [Business] because [one applied weakness].
+
+[Conclude] Overall, Option X is the better choice for [Business] because
+           [judgement tied to specific context from the extract].</pre>
+  </div>
+
+  <div class="block tip warning">
+    <div class="b-title">The single biggest trap</div>
+    <p>Justify is <strong>ONE-SIDED</strong>. Do NOT write &ldquo;On the one hand&hellip; on the other hand&hellip;&rdquo; Do NOT give a developed paragraph on Option 1 followed by a developed paragraph on Option 2. The examiner&rsquo;s report for Paper 1 says it explicitly: a candidate who weighs the benefits of one option against the benefits of the other scores <strong>Level 0 for AO3b judgement</strong>, because comparing two options is not the same as <em>justifying</em> one. You can only earn the 3 judgement marks by committing to one option and defending it.</p>
+  </div>
+
+  <div class="block tip">
+    <div class="b-title">There is no &ldquo;correct&rdquo; option</div>
+    <p>Examiners do not have a preferred answer. You can choose either option and still hit 9/9 &mdash; what matters is that the <em>reasoning</em> is tightly applied to the business in the extract. Pick whichever option you can build the stronger context-specific chain for. If one option lines up more obviously with a fact in the extract (e.g. cash-flow worries, a target market, a USP), pick that one.</p>
+  </div>
+
+  <!-- ============ WORKED EXAMPLE 1 ============ -->
+  <div class="q-card">
+    <div class="q-meta">Worked example 1 &middot; Edexcel 1BS0/01, May 2023, Q6(c) &middot; Section B &middot; <em>Lili Heating Ltd</em></div>
+    <div class="q-text">&ldquo;In order to make the business more successful, <em>Lili Heating Ltd</em> is considering two options: Option 1: offer a discounted price to female customers. Option 2: use social media to promote the business. Justify which <strong>one</strong> of these two options <em>Lili Heating Ltd</em> should choose.&rdquo; <span class="marks">9 marks</span></div>
+  </div>
+
+  <div class="model-answer">
+    <p><span class="ms-bullet">AO2</span> <strong>I would recommend Option 2, using social media to promote the business, for <em>Lili Heating Ltd</em></strong>, because the extract shows the business is trying to grow its customer base in a competitive plumbing and heating market where most engineers are male and the owner is keen to reach a wider audience.</p>
+
+    <p><span class="ms-bullet">AO2</span> <span class="ms-bullet">AO3a</span> Social media platforms such as Instagram and Facebook are extremely low cost compared with print or radio advertising, which matters for a small limited company like <em>Lili Heating Ltd</em> that is still building its reputation. Posting before-and-after photos of boiler installations and short videos of the team at work would let the owner showcase the quality of her engineering and the fact that she is a female-led business &mdash; a genuine point of difference in this industry. Because posts can be shared by satisfied customers, each happy household becomes a free promoter, which means the business gains word-of-mouth recommendations at almost no extra cost. As followers grow, the business reaches not only female customers but anyone in the local area searching for a trusted heating engineer, so demand for call-outs rises. Higher demand leads directly to higher sales revenue, supporting <em>Lili Heating Ltd</em>&rsquo;s aim of growing and becoming a successful established small business.</p>
+
+    <p><span class="ms-bullet">AO3b</span> Although Option 1 (a discount for female customers) might attract some new bookings, it would shrink the profit margin on every job and could even be seen as unfair by male customers who already use the business, risking lost repeat work.</p>
+
+    <p><span class="ms-bullet">AO3b</span> Overall, Option 2 is the better choice for <em>Lili Heating Ltd</em> because social media gives long-term, low-cost brand visibility that builds the reputation the business needs to grow, whereas a price discount only delivers a short-term sales bump while damaging margins &mdash; and reputation, not price, is what wins repeat customers in heating services.</p>
+  </div>
+
+  <div class="block scoring">
+    <div class="b-title">Why this scores 9/9</div>
+    <ul>
+      <li><strong>Paragraph 1 (Choice + AO2):</strong> Commits to Option 2 in sentence one. Names the business, names the market (plumbing and heating), and pulls the &ldquo;female-led&rdquo; point straight from the extract. Application is locked in before any analysis begins.</li>
+      <li><strong>Paragraph 2 (AO2 + AO3a):</strong> A long, linked chain &mdash; <em>low cost &rarr; showcases USP &rarr; followers share &rarr; free word of mouth &rarr; demand rises &rarr; revenue grows &rarr; supports the aim of growth</em>. Five connected reasoning steps. Each step uses an applied detail (Instagram/Facebook, before-and-after photos, female-led USP, local area). This is exactly the &ldquo;detailed interconnected points with logical chains of reasoning&rdquo; Level 3 demands.</li>
+      <li><strong>Paragraph 3 (AO3b rejection):</strong> One sentence that dismisses Option 1 with two applied weaknesses (margin shrinkage + risk of alienating existing male customers). The weakness <em>strengthens</em> the choice rather than balancing it.</li>
+      <li><strong>Paragraph 4 (AO3b judgement):</strong> Final sentence ties the decision to a specific business reality (&ldquo;reputation, not price, wins repeat customers in heating services&rdquo;). That is a justified, context-anchored judgement &mdash; not a generic &ldquo;therefore I think Option 2 is best.&rdquo;</li>
+    </ul>
+  </div>
+
+  <!-- ============ WORKED EXAMPLE 2 ============ -->
+  <div class="q-card">
+    <div class="q-meta">Worked example 2 &middot; Edexcel 1BS0/01, May 2024, Q6(c) &middot; Section B &middot; <em>Adikoggz</em></div>
+    <div class="q-text">&ldquo;To help prevent cash-flow problems <em>Adikoggz</em> is considering two options as a short-term source of finance: Option 1: an overdraft from the bank. Option 2: trade credit from suppliers. Justify which <strong>one</strong> of these two options <em>Adikoggz</em> should choose.&rdquo; <span class="marks">9 marks</span></div>
+  </div>
+
+  <div class="model-answer">
+    <p><span class="ms-bullet">AO2</span> <strong>I would recommend Option 2, trade credit from suppliers, for <em>Adikoggz</em></strong>, because the extract shows the business is trying to plug a short-term cash-flow gap caused by waiting for customer payments while still needing to buy stock to fulfil its next round of orders.</p>
+
+    <p><span class="ms-bullet">AO2</span> <span class="ms-bullet">AO3a</span> Trade credit lets <em>Adikoggz</em> receive its raw materials now and pay the supplier 30 or even 60 days later, which directly matches the timing problem the cash-flow forecast highlights &mdash; cash going out before cash comes in. Because there is no interest charged on standard trade credit, the business avoids the extra finance costs that an overdraft would add at a time when margins are already tight. The delayed payment date also gives <em>Adikoggz</em> the breathing space to convert stock into finished products, sell them, collect the money from customers, and then pay the supplier from that incoming cash &mdash; effectively letting customers fund the next batch of stock. This protects the business&rsquo;s cash balance, which the owner needs in order to keep paying wages and rent on time and avoid the risk of insolvency. As a result, <em>Adikoggz</em> can keep trading smoothly during the lean period, supporting its aim of survival as a small business.</p>
+
+    <p><span class="ms-bullet">AO3b</span> Although Option 1 (an overdraft) is flexible, the bank charges interest daily on the amount used and can demand repayment at short notice, which would put extra pressure on <em>Adikoggz</em>&rsquo;s already fragile cash flow.</p>
+
+    <p><span class="ms-bullet">AO3b</span> Overall, Option 2 is the better choice for <em>Adikoggz</em> because trade credit fixes the specific timing mismatch in its cash-flow forecast at zero interest, whereas an overdraft would solve the same problem but at a cost &mdash; and for a small business already struggling to balance inflows and outflows, the cheaper option that uses an existing supplier relationship is the more sustainable short-term fix.</p>
+  </div>
+
+  <div class="block scoring">
+    <div class="b-title">Why this scores 9/9</div>
+    <ul>
+      <li><strong>Paragraph 1 (Choice + AO2):</strong> Picks Option 2 immediately and grounds it in the specific cash-flow problem flagged in the extract (waiting for customer payments while needing to buy stock). The business name is used; the reason is contextual, not generic.</li>
+      <li><strong>Paragraph 2 (AO2 + AO3a):</strong> A six-step chain &mdash; <em>credit period matches timing gap &rarr; no interest &rarr; convert stock to cash &rarr; customers effectively fund stock &rarr; cash balance protected &rarr; wages/rent paid &rarr; survival</em>. Uses the cash-flow forecast, the timing mismatch, the 30/60-day credit period, and the survival aim. Each step is interconnected and applied.</li>
+      <li><strong>Paragraph 3 (AO3b rejection):</strong> One sentence dismissing the overdraft using two applied weaknesses (interest cost + bank&rsquo;s recall right). It reinforces, not balances.</li>
+      <li><strong>Paragraph 4 (AO3b judgement):</strong> Conclusion explicitly weighs the two against the business&rsquo;s context (&ldquo;already struggling to balance inflows and outflows&rdquo;) and lands on <em>sustainability</em> as the deciding factor. That is a justified, business-specific judgement &mdash; the hallmark of Level 3 AO3b.</li>
+    </ul>
+  </div>
+
+  <!-- ============ COMMON PITFALLS ============ -->
+  <div class="block tip warning">
+    <div class="b-title">Common pitfalls (these cost the most marks)</div>
+    <ul>
+      <li><strong>Writing a balanced essay.</strong> The single biggest trap. A paragraph on Option 1 followed by a paragraph on Option 2 &mdash; even if both are well-written &mdash; gets Level 0 for judgement and is capped at Level 1 or low Level 2 overall.</li>
+      <li><strong>Forgetting to apply to the named business.</strong> Writing in general business terms (&ldquo;social media is cheap, so businesses can reach more customers&rdquo;) without using the business name or specific facts from the extract loses every AO2 mark. Use the italicised business name at least three times.</li>
+      <li><strong>No final judgement sentence.</strong> Stopping after the PEEL paragraph and forgetting the &ldquo;Overall&hellip;&rdquo; conclusion costs the 3 AO3b marks. Always finish with a context-anchored verdict.</li>
+      <li><strong>Worrying about picking the &ldquo;wrong&rdquo; option.</strong> There is no wrong option. Pick whichever option lines up most clearly with facts in the extract &mdash; that&rsquo;s the one you can write the strongest chain for.</li>
+      <li><strong>Burying the evidence in a generic chain.</strong> Don&rsquo;t just drop a fact from the extract and walk away. Weave it into the reasoning: <em>&ldquo;Because the extract says X, this means Y for [business], which leads to Z&hellip;&rdquo;</em></li>
+      <li><strong>Defining terms.</strong> Don&rsquo;t waste a sentence defining what trade credit is. There are no AO1 marks on a 9-mark Justify &mdash; spend the time on application and chains of reasoning instead.</li>
+    </ul>
+  </div>
+
+  <!-- ============ LEVEL DESCRIPTORS ============ -->
+  <div class="block tip success">
+    <div class="b-title">What Level 3 (7&ndash;9 marks) looks like</div>
+    <p>The mark scheme uses three levels. In plain English:</p>
+    <ul>
+      <li><strong>Level 1 (1&ndash;3 marks)</strong> &mdash; you mention the business once or twice, you make a couple of basic points without linking them, and your judgement is just an opinion (&ldquo;I think Option 1 is better&rdquo;) rather than a reasoned verdict. Often a balanced answer gets stuck here.</li>
+      <li><strong>Level 2 (4&ndash;6 marks)</strong> &mdash; you apply to the business in places, you build a chain of reasoning but it has gaps or jumps, and your judgement is supported but not strongly tied to the business&rsquo;s specific context. Solid effort, but the analysis isn&rsquo;t quite watertight.</li>
+      <li><strong>Level 3 (7&ndash;9 marks)</strong> &mdash; application runs <em>throughout</em> the answer (the business name and extract facts appear in every paragraph), the analysis is a <strong>connected chain</strong> of <em>because&hellip;therefore&hellip;which means&hellip;</em> with no logical jumps, and the final judgement is <strong>justified</strong> by pointing to something specific about this business &mdash; its size, its customers, its market, its aim &mdash; that makes the chosen option the better fit.</li>
+    </ul>
+    <p>The mental test for Level 3: if you removed the business name from your answer, would it still make sense as a general business answer? If yes, you&rsquo;re at Level 2. If no &mdash; if your answer only works for <em>this</em> business in <em>this</em> extract &mdash; you&rsquo;re at Level 3.</p>
+  </div>
+</section>
+
+<section class="er-section t3" id="twelve-mark">
+  <div class="section-header">
+    <div class="num">12</div>
+    <div class="title">Evaluate / Justify &mdash; The big one</div>
+    <div class="meta">mark question</div>
+  </div>
+
+  <div class="block intro">
+    <div class="b-title">What this question is, Nicole</div>
+    <p>The 12-marker is the <strong>highest-value single question on Paper 1</strong>. It always sits as the <strong>final part of Question 7 in Section C</strong>, attached to the longer Section&nbsp;C case study and Extract&nbsp;B. Across the recent papers you have been working through, the command word at the 12-mark slot has been <strong>Evaluate</strong> every time: 2022 (Q7e on <em>Digital Allies</em>), 2023 (Q7e on <em>Ripple</em>) and 2024 (Q7e on <em>PFC</em>) all used &ldquo;Evaluate&hellip;&rdquo;. Some practice booklets do use &ldquo;Justify&rdquo; at 12 marks, so be ready for either &ndash; the technique is identical, but the AO weighting is heavier on evaluation.</p>
+    <p>The mark split is roughly <span class="ms-bullet">AO1b &times;3</span> <span class="ms-bullet">AO2 &times;3</span> <span class="ms-bullet">AO3a &times;3</span> <span class="ms-bullet">AO3b &times;3</span> &mdash; so a quarter of the marks are for the <em>judgement</em> itself. That is the single biggest difference from a 9-mark Justify. The 9-marker wants a <strong>one-sided, persuasive</strong> recommendation; the 12-marker wants <strong>balanced</strong> analysis (a strong FOR <em>and</em> a strong AGAINST) followed by a <strong>contextual judgement</strong> that weighs them up.</p>
+    <p><strong>The &ldquo;It depends on&hellip;&rdquo; rule.</strong> Your conclusion must add <em>new</em> evaluative content &ndash; it cannot just repeat the body. The cleanest way to do this is to open with <em>&ldquo;It depends on&hellip;&rdquo;</em> and name <strong>one or two contextual factors</strong> that decide the answer: size of business, time horizon (short vs long run), level of competition, magnitude of the change, market conditions, or the strength of cash flow. Then commit to a judgement using those factors.</p>
+  </div>
+
+  <div class="block structure">
+    <div class="b-title">The 4-part structure</div>
+    <p>Aim for roughly 25&ndash;30 minutes and four clearly separated paragraphs. Two PEEL bodies, plus a real intro and a real conclusion.</p>
+    <pre class="template">INTRO (1&ndash;2 sentences)
+   "Whether [decision/factor] benefits [business name] depends on
+   several factors."  Name what the body will weigh up.
+
+PEEL 1 &ndash; FOR  (4&ndash;5 sentences, fully applied)
+   Point   &rarr; one clear benefit / supporting argument
+   Evidence&rarr; quote / paraphrase from the case study or Extract B
+   Explain &rarr; chain: because&hellip; which means&hellip; therefore&hellip;
+   Link    &rarr; back to the exact wording of the question
+
+PEEL 2 &ndash; AGAINST  (4&ndash;5 sentences, fully applied)
+   Point   &rarr; one clear drawback / counter-argument
+   Evidence&rarr; different fact from the case study
+   Explain &rarr; another &ldquo;because&hellip; which means&hellip;&rdquo; chain
+   Link    &rarr; back to the question wording
+
+EVALUATIVE CONCLUSION (3&ndash;4 sentences)  &larr;  the marks-making bit
+   "Overall, [decision] is/is not [important / the right choice]&hellip;"
+   "It depends on [factor 1] and [factor 2]&hellip;"
+   Final judgement: commit to ONE side, justified by those factors.</pre>
+    <div class="block tip warning">
+      <div class="b-title">Warning &mdash; the conclusion trap</div>
+      <p>The conclusion <strong>must add new evaluative content</strong>. If it just summarises what you already said in the body (&ldquo;So as I have shown, technology is important because&hellip;&rdquo;), your answer caps at <strong>Level 2 (max 8/12)</strong> no matter how strong the body was. Always finish with <em>&ldquo;It depends on&hellip;&rdquo;</em> + a contextual factor the body did not fully explore.</p>
+    </div>
+  </div>
+
+  <div class="block example">
+    <div class="b-title">Worked example 1 &mdash; 2024 (PFC)</div>
+    <div class="q-card">
+      <div class="q-meta">Edexcel 1BS0/01 &ndash; May 2024 &ndash; Section C &ndash; Question 7(e)</div>
+      <div class="q-text">&ldquo;Evaluate the importance of the level of consumer income to the success of <em>PFC</em>. You should use the information provided as well as your knowledge of business.&rdquo; <span class="marks">12 marks</span></div>
+    </div>
+    <div class="model-answer">
+      <p><em>Intro.</em> Whether the level of consumer income is important to the success of <em>PFC</em>, a private fitness centre charging monthly membership fees, depends on how price-sensitive its target customers are and how much competition exists in the gym market.</p>
+      <p><em>PEEL 1 &mdash; FOR (income matters a lot).</em> Gym membership is a <strong>luxury / normal good</strong>, which means demand is <strong>income-elastic</strong>: when consumer income rises, more households can afford the &pound;30&ndash;&pound;40 monthly fee at a private gym rather than a cheaper budget chain. Table&nbsp;3 in the source booklet shows London has the highest gym membership rate (18%) and London also has the highest average earnings in the UK, which supports the link between disposable income and demand for paid fitness. If incomes in <em>PFC</em>&rsquo;s region rise, more potential customers will move from no-gym or budget-gym options to a premium centre like <em>PFC</em>, increasing new memberships and revenue, which is exactly the success measure the owner is trying to grow. <span class="ms-bullet">AO1b</span> <span class="ms-bullet">AO2</span> <span class="ms-bullet">AO3a</span></p>
+      <p><em>PEEL 2 &mdash; AGAINST (other factors matter more).</em> However, consumer income is only one of several influences on <em>PFC</em>&rsquo;s success, and on its own it cannot guarantee growth. <em>PFC</em> operates in a competitive market with chains, council leisure centres and at-home fitness apps, so even if local incomes rise, customers may spend that extra money at a cheaper competitor or on a Peloton-style alternative instead of <em>PFC</em>. The case also implies <em>PFC</em>&rsquo;s membership growth has stalled despite a generally rising UK income trend, which suggests that <strong>marketing, location and the quality of the service</strong> (Option&nbsp;2&rsquo;s individual fitness plans) drive new sign-ups more directly than the macro income figure. In other words, the level of income sets the <em>ceiling</em> on what <em>PFC</em> could earn, but the business&rsquo;s own decisions decide how much of that ceiling it actually reaches. <span class="ms-bullet">AO1b</span> <span class="ms-bullet">AO2</span> <span class="ms-bullet">AO3a</span></p>
+      <p><em>Conclusion.</em> Overall, consumer income is <strong>important but not the most important</strong> factor in <em>PFC</em>&rsquo;s success. <strong>It depends on the time horizon and the level of local competition</strong>: in the <strong>short run</strong>, with the gym market already crowded, <em>PFC</em>&rsquo;s pricing, fitness plans and customer service will move new-member numbers far more than a 1&ndash;2% change in local wages; but in the <strong>long run</strong>, sustained income growth in the region would widen the pool of customers who can afford a private gym and would protect <em>PFC</em> during recessions if it positions itself as good value. So for the owner&rsquo;s current goal of <em>increasing new memberships</em>, income is a useful background indicator, but operational decisions matter more day-to-day. <span class="ms-bullet">AO3b</span></p>
+    </div>
+    <div class="block scoring">
+      <div class="b-title">Why this scores 11&ndash;12 / 12 (Level 3)</div>
+      <ul>
+        <li><strong>Detailed application throughout</strong> &mdash; names <em>PFC</em>, uses Table&nbsp;3&rsquo;s London figure (18%), references Option&nbsp;2 from the case, mentions the gym market structure. AO2 is hit in every paragraph, not just sprinkled on top.</li>
+        <li><strong>Both sides are developed, not just listed</strong> &mdash; each PEEL has a full chain (income elastic &rarr; more affordability &rarr; more sign-ups), and the counter-argument is genuinely strong, not a token sentence.</li>
+        <li><strong>Interconnected reasoning</strong> &mdash; the answer links income to <em>price elasticity</em>, then to <em>competitor choice</em>, then to <em>the owner&rsquo;s actual goal</em>. Ideas chain together rather than sitting separately.</li>
+        <li><strong>The judgement adds new content</strong> &mdash; &ldquo;It depends on time horizon and level of competition&rdquo; brings short-run vs long-run thinking that was not in the body, so it counts as fresh evaluation (AO3b).</li>
+        <li><strong>Clear final decision</strong> &mdash; commits to &ldquo;important but not the most important&rdquo;, with a reason. No fence-sitting.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block example">
+    <div class="b-title">Worked example 2 &mdash; 2023 (Ripple)</div>
+    <div class="q-card">
+      <div class="q-meta">Edexcel 1BS0/01 &ndash; May 2023 &ndash; Section C &ndash; Question 7(e)</div>
+      <div class="q-text">&ldquo;Evaluate the importance of price in <em>Ripple</em>&rsquo;s marketing mix. You should use the information provided as well as your knowledge of business.&rdquo; <span class="marks">12 marks</span></div>
+    </div>
+    <div class="model-answer">
+      <p><em>Intro.</em> Whether price is the most important element of <em>Ripple</em>&rsquo;s marketing mix depends on how price-sensitive its customers are and how strongly its product, place and promotion already differentiate it from rivals.</p>
+      <p><em>PEEL 1 &mdash; FOR (price is very important).</em> <em>Ripple</em> is a small start-up competing against larger, established businesses, so price is often the most visible reason a new customer decides to try a small brand for the first time. Because <em>Ripple</em> asks questions to identify customer needs (as mentioned in the case), it can use a <strong>penetration pricing</strong> strategy &mdash; setting a lower introductory price to win market share &mdash; and then move customers onto repeat purchases once they trust the brand. A competitive price also directly affects revenue: if the price is too high, demand falls sharply for a relatively unknown small business; if it is set correctly, sales volume and word-of-mouth both rise. For a business of <em>Ripple</em>&rsquo;s size, where every customer matters, getting price right is therefore central to whether the marketing mix actually delivers sales. <span class="ms-bullet">AO1b</span> <span class="ms-bullet">AO2</span> <span class="ms-bullet">AO3a</span></p>
+      <p><em>PEEL 2 &mdash; AGAINST (other 3 Ps may matter more).</em> On the other hand, the marketing mix is the <strong>four Ps working together</strong>, and for a small business like <em>Ripple</em>, competing on price alone is dangerous because larger rivals can undercut almost any price <em>Ripple</em> sets. The case shows <em>Ripple</em> already differentiates itself through <strong>product</strong> (asking questions to tailor to customer needs), which is a form of <strong>USP</strong> that bigger competitors find harder to copy. If <em>Ripple</em>&rsquo;s customers value that personal service, they are likely to be <strong>price-inelastic</strong>: a small price rise will not lose them, because they cannot get the same tailored experience elsewhere. In that case, <strong>product and promotion</strong> are doing more of the work than price, and over-focusing on a low price would only squeeze margins and damage cash flow. <span class="ms-bullet">AO1b</span> <span class="ms-bullet">AO2</span> <span class="ms-bullet">AO3a</span></p>
+      <p><em>Conclusion.</em> Overall, price is <strong>important but not the single most important</strong> element of <em>Ripple</em>&rsquo;s marketing mix. <strong>It depends on the size of the business and the strength of competition</strong>: as a small business facing larger rivals, <em>Ripple</em> cannot win a price war, so its tailored product and customer relationships should lead the mix &mdash; with price set carefully to support, not replace, that differentiation. If competition intensifies further, <em>Ripple</em> should adjust price as a tactical lever rather than treat it as its main weapon, because the moment it loses its USP, no price will save it. <span class="ms-bullet">AO3b</span></p>
+    </div>
+    <div class="block scoring">
+      <div class="b-title">Why this scores 11&ndash;12 / 12 (Level 3)</div>
+      <ul>
+        <li><strong>Applies the case study repeatedly</strong> &mdash; &ldquo;asking questions to identify customer needs&rdquo; appears as evidence in both sides of the argument, used differently each time. That is sophisticated AO2.</li>
+        <li><strong>Brings in real business theory</strong> &mdash; penetration pricing, price elasticity, USP, and the four Ps are all used correctly. That is solid AO1b knowledge.</li>
+        <li><strong>Two-stage chains of reasoning</strong> &mdash; each &ldquo;because&hellip; which means&hellip; therefore&hellip;&rdquo; runs at least two links deep, which is what L3 AO3a needs.</li>
+        <li><strong>Judgement is genuinely evaluative</strong> &mdash; &ldquo;important but not the single most important&rdquo; with the contextual qualifier &ldquo;depends on size of business and strength of competition&rdquo; is a textbook 12-mark conclusion.</li>
+        <li><strong>Adds a forward-looking note</strong> &mdash; the final sentence about &ldquo;if competition intensifies&rdquo; shows you can think about <em>what would change the answer</em>, which is the top of AO3b.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="b-title">Level descriptors translated for self-marking</div>
+    <p>When you mark your own practice answers, Nicole, use this plain-English version of the official levels.</p>
+    <p><strong>Level 1 &mdash; 1&ndash;4 marks (&ldquo;notes-y&rdquo;).</strong> Some relevant points, but they are isolated. Knowledge is there but used in a generic way &mdash; you could swap the business name for any other and the answer would still read the same. Little or no judgement, or just one weak &ldquo;in conclusion I think&hellip;&rdquo; sentence. No real chain of reasoning. If your draft answer would suit <em>any</em> small business, you are at L1.</p>
+    <p><strong>Level 2 &mdash; 5&ndash;8 marks (&ldquo;decent essay but no kicker&rdquo;).</strong> Clear knowledge and at least some case-study application. The body has two sides and some chained explanation, but either (a) the argument stays one-sided, (b) the application is patchy, or (c) the conclusion just summarises the body and adds no new evaluative content. This is where most students land. <strong>The cap is 8 marks</strong> &mdash; you cannot reach L3 without a genuinely evaluative conclusion.</p>
+    <p><strong>Level 3 &mdash; 9&ndash;12 marks (&ldquo;the full picture&rdquo;).</strong> Detailed, sustained application using specific facts from the case and Extract&nbsp;B. Both FOR and AGAINST sides are <em>developed</em>, not just listed, and ideas connect across paragraphs. The conclusion makes a clear judgement, justifies it using <strong>one or two contextual factors</strong> (size / time / competition / magnitude), and adds at least one new evaluative idea that was not in the body. To hit the very top (11&ndash;12), the judgement should also note <em>what would change the answer</em>.</p>
+  </div>
+
+  <div class="block tip warning">
+    <div class="b-title">Common pitfalls &mdash; what loses marks</div>
+    <ul>
+      <li><strong>Listing without chaining.</strong> &ldquo;Price is important. Product is important. Promotion is important.&rdquo; &mdash; no chain, no L3. Every point needs a <em>because&hellip; which means&hellip; therefore&hellip;</em>.</li>
+      <li><strong>Strong analysis but weak / missing judgement.</strong> A brilliant two-sided body with no real conclusion caps at <strong>Level 2 (max 8/12)</strong>. The judgement is worth roughly a quarter of the marks &mdash; do not skip it.</li>
+      <li><strong>Conclusion that just summarises.</strong> &ldquo;In conclusion, as I said above, technology has benefits and drawbacks&hellip;&rdquo; adds <em>nothing</em>. Use &ldquo;It depends on&hellip;&rdquo; to force fresh evaluative content (size, time, competition, magnitude, market conditions).</li>
+      <li><strong>Forgetting case-study evidence.</strong> Generic textbook answers lose all AO2 marks (3/12 gone). Always quote or paraphrase at least one specific fact per body paragraph &mdash; a figure from a table, a line from Extract&nbsp;B, an option from the previous 9-mark question.</li>
+      <li><strong>Sitting on the fence.</strong> &ldquo;Both have merit, so it is hard to say&rdquo; is not a judgement. You <em>must</em> commit to a side &mdash; &ldquo;important but not the most important&rdquo; is allowed; &ldquo;I cannot decide&rdquo; is not.</li>
+      <li><strong>Running out of time.</strong> The 12-marker is at the very end of the paper. If you have only 10&nbsp;minutes left, write the intro, one strong PEEL, and a full evaluative conclusion &ndash; a complete short answer scores better than a long unfinished one.</li>
+    </ul>
+  </div>
+
+  <div class="block tip success">
+    <div class="b-title">Nicole&rsquo;s 12-mark checklist before you write</div>
+    <ul>
+      <li>Underline the <strong>command word</strong> (Evaluate / Justify) and the <strong>focus</strong> of the question.</li>
+      <li>Jot 1 FOR point + 1 AGAINST point + 2 contextual factors for the conclusion <em>before</em> you start writing.</li>
+      <li>Plan to use <strong>at least two specific facts</strong> from the case / Extract&nbsp;B / tables.</li>
+      <li>Write the conclusion last but know its &ldquo;It depends on&hellip;&rdquo; phrase before you begin paragraph&nbsp;2.</li>
+      <li>Finish with a sentence that commits to a side. No fence-sitting.</li>
+    </ul>
+  </div>
+</section>
+
+
+<footer class="doc-footer">
+  <strong>About this guide.</strong> All model answers are original, written in mark-scheme style for educational use; they are not reproductions of Edexcel mark-scheme content. Past-paper questions are briefly cited (paper series + question number) and quoted within fair-use limits for educational commentary. Spec reference: Edexcel GCSE (9-1) Business 1BS0, Paper 1 &mdash; Investigating Small Business, 90 marks, 1h 45min.
+  <br><br>
+  <strong>Paper-by-paper structure (recent series):</strong> 3 &times; 6-mark + 2 &times; 9-mark + 1 &times; 12-mark = <strong>48 of 90 marks</strong> (53%) from extended responses. The rest is MCQs, short answers and calculations.
+</footer>
+
+</div>
+</body>
+</html>
