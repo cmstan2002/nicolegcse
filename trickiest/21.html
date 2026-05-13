@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J277/01 Trickiest — Rank 21 — Jun 2024 Q6(c)</title>
+<style>
+  :root {
+    --ink: #003366;
+    --ink-soft: #1c4a78;
+    --accent: #d68910;
+    --danger: #c0392b;
+    --success: #2c8a3d;
+    --bg: #ffffff;
+    --bg-soft: #f7f9fc;
+    --border: #d8e0eb;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    font-size: 16px;
+  }
+
+  /* Layout */
+  .wrap {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 32px 24px 80px 24px;
+  }
+
+  /* Side nav */
+  .sidenav {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    width: 56px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    background: rgba(255,255,255,0.96);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 6px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,51,102,0.08);
+    font-size: 12px;
+  }
+  .sidenav ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: navrank;
+  }
+  .sidenav li { margin: 0; }
+  .sidenav a {
+    display: block;
+    text-align: center;
+    padding: 4px 0;
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .sidenav a:hover { background: var(--ink); color: #fff; }
+  .sidenav .nav-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  @media (max-width: 1100px) {
+    .sidenav { display: none; }
+  }
+
+  /* Cover */
+  .cover {
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  .cover h1 {
+    font-size: 28px;
+    margin: 0 0 6px 0;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .cover .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin: 0 0 18px 0;
+    font-style: italic;
+  }
+  .cover .methodology {
+    background: var(--bg-soft);
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 0 0 20px 0;
+    font-size: 14.5px;
+  }
+  .cover .methodology p { margin: 0 0 6px 0; }
+  .cover .methodology p:last-child { margin-bottom: 0; }
+  .badge-inferred {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    vertical-align: middle;
+  }
+
+  /* Summary table */
+  .summary {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 32px 0;
+    font-size: 13.5px;
+  }
+  .summary th, .summary td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .summary th {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .summary tr:nth-child(even) td { background: var(--bg-soft); }
+  .summary td.rank-cell {
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+    width: 44px;
+  }
+  .summary td.marks-cell { text-align: center; width: 56px; }
+  .summary a { color: var(--ink); text-decoration: none; }
+  .summary a:hover { text-decoration: underline; }
+
+  /* Question card */
+  .q-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    margin: 0 0 32px 0;
+    background: #fff;
+    overflow: hidden;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    box-shadow: 0 1px 3px rgba(0,51,102,0.04);
+  }
+
+  .q-head {
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    font-size: 13.5px;
+  }
+  .q-head .rank {
+    font-size: 18px;
+    font-weight: 800;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 4px;
+  }
+  .q-head .paper {
+    font-weight: 700;
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .q-head .qid {
+    font-weight: 700;
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .q-head .marks {
+    font-weight: 600;
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .q-head .topic {
+    font-style: italic;
+    color: #e6eef7;
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 12.5px;
+  }
+  .q-head .inferred-tag {
+    background: var(--accent);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .q-card .block { padding: 14px 18px 4px 18px; }
+  .q-card .block h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 4px 0 8px 0;
+    font-weight: 700;
+  }
+  .q-card .block + .block { padding-top: 6px; }
+
+  /* Coloured section headers */
+  .q-block { border-top: 1px solid var(--border); }
+  .q-block h3 { color: var(--ink); }
+  .q-block h3::before { content: "Question — "; color: var(--ink); }
+  .q-block h3 { content: none; }
+  .q-block h3 { color: var(--ink); }
+
+  .why-tricky { background: #fcf2f0; border-top: 1px solid #f0d2cd; }
+  .why-tricky h3 { color: var(--danger); }
+
+  .model-answer { background: #f1faf3; border-top: 1px solid #cfe7d4; }
+  .model-answer h3 { color: var(--success); }
+
+  .watch-out { background: #fdf6e7; border-top: 1px solid #f1deb0; }
+  .watch-out h3 { color: #a36408; }
+
+  /* Bottom rounded fill for final block in card */
+  .q-card .block:last-child { padding-bottom: 14px; }
+
+  /* Content within blocks */
+  .q-text {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--ink);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 14.5px;
+  }
+  .q-text p { margin: 0 0 8px 0; }
+  .q-text p:last-child { margin-bottom: 0; }
+  .q-text ul { margin: 4px 0 8px 22px; padding: 0; }
+  .q-text li { margin: 2px 0; }
+  .q-text .marks-tag {
+    display: inline-block;
+    background: var(--ink);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-left: 4px;
+  }
+  .qstem-tag {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  /* Cloze gap visual */
+  .gap {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--ink);
+    margin: 0 4px;
+    padding: 0 4px;
+    vertical-align: baseline;
+    color: transparent;
+  }
+  .gap-num {
+    display: inline-block;
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .gap-filled {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--success);
+    padding: 0 6px;
+    font-weight: 700;
+    color: var(--success);
+    background: #eaf6ec;
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* Word bank */
+  .wordbank {
+    background: #f4f7fb;
+    border: 1px dashed var(--ink-soft);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--ink);
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
+  /* Tables inside question / answer */
+  table.qtable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 14px;
+  }
+  table.qtable th, table.qtable td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  table.qtable th {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+  }
+  table.qtable td.empty { background: #fff; min-height: 26px; }
+  table.qtable td.tick { text-align: center; width: 28px; }
+  table.qtable td.correct { color: var(--success); font-weight: 700; text-align: center; background: #eaf6ec; }
+  table.qtable td.partial { color: var(--ink-soft); text-align: center; font-style: italic; }
+  table.qtable td.filled { color: var(--success); font-weight: 700; background: #eaf6ec; }
+
+  pre.code-block {
+    background: #f4f7fb;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    overflow-x: auto;
+  }
+
+  /* Why tricky body */
+  .why-body, .watch-body { font-size: 14.5px; }
+  .er-quote {
+    font-style: italic;
+    border-left: 3px solid var(--danger);
+    padding: 6px 12px;
+    margin: 6px 0;
+    background: rgba(192, 57, 43, 0.05);
+    font-size: 14px;
+  }
+  .er-quote::before { content: "\201C"; font-weight: 700; }
+  .er-quote::after { content: "\201D"; font-weight: 700; }
+  .er-source {
+    display: block;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .ms-note {
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 13.5px;
+  }
+  .ms-note strong { color: var(--danger); }
+  .inferred-note {
+    background: #fff8eb;
+    border: 1px solid #f1deb0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .inferred-note strong { color: var(--accent); }
+
+  /* Model answer */
+  .answer-text {
+    background: #fff;
+    border: 1px solid #cfe7d4;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 14.5px;
+  }
+  .answer-text p { margin: 0 0 8px 0; }
+  .answer-text p:last-child { margin-bottom: 0; }
+  .answer-text strong { color: var(--ink); background: #fff7df; padding: 0 2px; border-radius: 2px; }
+  .answer-text em { font-style: italic; }
+  .answer-text ol, .answer-text ul { margin: 4px 0 8px 22px; padding: 0; }
+  .answer-text li { margin: 4px 0; }
+
+  .mark-allocation {
+    background: #fff;
+    border: 1px solid #cfe7d4;
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 13.5px;
+  }
+  .mark-allocation .ma-title {
+    font-weight: 700;
+    color: var(--success);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .mark-allocation ul { margin: 0 0 0 18px; padding: 0; }
+  .mark-allocation li { margin: 2px 0; }
+  .mark-allocation strong { color: var(--ink); }
+
+  .watch-body { font-size: 14px; }
+  .watch-body strong { color: #a36408; }
+
+  /* Footer */
+  footer {
+    border-top: 2px solid var(--ink);
+    margin-top: 32px;
+    padding-top: 16px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  footer p { margin: 4px 0; }
+
+  /* Print */
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    body { font-size: 11pt; }
+    .sidenav { display: none; }
+    .q-card { page-break-inside: avoid; box-shadow: none; }
+    .cover { page-break-after: always; }
+    .wrap { padding: 0; max-width: 100%; }
+  }
+</style>
+
+<style>
+  /* per-page footer nav */
+  footer.page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-top: 2px solid var(--ink);
+    margin-top: 32px;
+    padding: 14px 0 8px 0;
+    font-size: 14px;
+  }
+  footer.page-nav a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 700;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-soft);
+  }
+  footer.page-nav a:hover {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  footer.page-nav .disabled {
+    color: var(--ink-soft);
+    background: transparent;
+    border-color: transparent;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+  footer.page-nav .all-link {
+    flex: 0 0 auto;
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<section class="q-card" id="rank-21">
+  <header class="q-head" style="background:#0B5394;">
+    <span class="rank">#21</span>
+    <span class="paper">Jun 2024</span>
+    <span class="qid">Q6(c)</span>
+    <span class="marks">3 marks</span>
+    <span class="topic">1.1.2 &mdash; CPU performance characteristics</span>
+  </header>
+
+  <div class="block q-block">
+    <h3>Question</h3>
+    <div class="q-text">
+      <p class="qstem-tag">Q6 stem: A computer has a Central Processing Unit (CPU).</p>
+      <p><strong>6(c)</strong> Give three characteristics of a CPU that can affect its performance.</p>
+      <ol>
+        <li>....................................................................................................</li>
+        <li>....................................................................................................</li>
+        <li>....................................................................................................</li>
+      </ol>
+      <p><span class="marks-tag">[3]</span></p>
+    </div>
+  </div>
+
+  <div class="block why-tricky">
+    <h3>Why this question is tricky</h3>
+    <div class="why-body">
+      <p class="er-quote">Candidates were often able to identify at least one characteristic of a CPU, most commonly the clock speed and number of cores. Some responses were not precise enough as to the characteristics, for example stating &lsquo;clock&rsquo; or &lsquo;core&rsquo; without reference to the speed of the clock, or the number of cores, which were too ambiguous.<span class="er-source">&mdash; J277_01_ER_Jun2024.txt lines 337&ndash;341</span></p>
+      <div class="ms-note">MS complexity <strong>4/10</strong>: 1 mark each to max 3, but the MS explicitly lists <code>'clock'</code>, <code>'cache'</code>, <code>'speed'</code>, <code>'cores'</code> as <strong>NE (not enough)</strong> &mdash; bare nouns score zero. Each characteristic must be a measurable quantity.</div>
+      <div class="ms-note"><strong>Specific traps:</strong>
+        <ul>
+          <li>Bare-word answers rejected: single nouns (&lsquo;clock&rsquo;, &lsquo;cache&rsquo;, &lsquo;cores&rsquo;) score <strong>0</strong>.</li>
+          <li>&ldquo;Clock speed on its own is NE&rdquo; in some contexts &mdash; phrase it as a measurable property the CPU has.</li>
+          <li>&ldquo;Speed&rdquo; alone is too ambiguous (could mean clock, bus or RAM).</li>
+          <li>Listing three CPU <em>components</em> (ALU, CU, registers) instead of three <em>performance characteristics</em> scores 0.</li>
+          <li>Repeating the same characteristic with different wording (e.g. &ldquo;fast clock&rdquo; + &ldquo;high clock rate&rdquo;) scores once.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block model-answer">
+    <h3>Full-marks model answer</h3>
+    <div class="answer-text">
+      <ol>
+        <li><strong>Clock speed</strong> &mdash; the frequency at which the CPU executes the fetch&ndash;execute cycle (measured in GHz); a higher clock speed means more instructions can be processed per second.</li>
+        <li><strong>Cache size</strong> &mdash; the amount of fast memory built into the CPU; a larger cache stores more frequently used instructions and data so the CPU spends less time waiting for main memory.</li>
+        <li><strong>Number of cores</strong> &mdash; each core can execute its own fetch&ndash;execute cycle simultaneously, so more cores allow more instructions to be processed in parallel.</li>
+      </ol>
+    </div>
+    <div class="mark-allocation">
+      <div class="ma-title">Mark allocation (3 marks &mdash; 1 mark each to max 3)</div>
+      <ul>
+        <li><strong>Clock speed</strong> (qualified) &rarr; MS bullet &ldquo;Clock speed on its own is NE&rdquo; (phrased as <em>clock speed</em> with reference to frequency, not bare &ldquo;clock&rdquo; or bare &ldquo;speed&rdquo;) &mdash; <code>J277_01_MS_Jun2024.txt:611&ndash;612</code>.</li>
+        <li><strong>Cache size</strong> &rarr; MS bullet &ldquo;Cache size&rdquo; (not bare &ldquo;cache&rdquo;) &mdash; <code>J277_01_MS_Jun2024.txt:613</code>.</li>
+        <li><strong>Number of cores</strong> &rarr; MS bullet &ldquo;Number of cores&rdquo; (not bare &ldquo;cores&rdquo; or &ldquo;core&rdquo;) &mdash; <code>J277_01_MS_Jun2024.txt:614</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block watch-out">
+    <h3>Watch out for...</h3>
+    <div class="watch-body">
+      <p>The Examiner Report flags that many candidates wrote bare nouns like &ldquo;clock&rdquo; or &ldquo;core&rdquo; and lost marks for being <strong>too ambiguous</strong>. Every characteristic must be expressed as a <strong>measurable quantity</strong> &mdash; &ldquo;speed of the clock&rdquo;, &ldquo;size of the cache&rdquo;, &ldquo;number of cores&rdquo;, not just the noun. Three precise phrases score 3; three bare nouns score 0. Also avoid listing CPU <em>parts</em> (ALU/CU/registers) &mdash; those are components, not performance characteristics.</p>
+    </div>
+  </div>
+</section>
+<footer class="page-nav">
+  <a href="20.html">&larr; Prev</a>
+  <a class="all-link" href="index.html">All 21</a>
+  <span class="disabled">Next &rarr;</span>
+</footer>
+</div>
+</body>
+</html>
