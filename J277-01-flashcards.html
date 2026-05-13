@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0E0D0B">
+<title>J277/01 · Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --ink: #0E0D0B;
+    --card: #1A1815;
+    --card-elev: #211E1A;
+    --border: #2D2924;
+    --border-soft: #1F1C18;
+    --text: #ECE6D7;
+    --text-dim: #968F80;
+    --text-faint: #5A5448;
+    --accent: #D4A056;
+    --accent-bright: #E8B96A;
+    --accent-dim: rgba(212, 160, 86, 0.14);
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', Menlo, monospace;
+  }
+
+  html, body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(212, 160, 86, 0.07), transparent 55%),
+      radial-gradient(ellipse at 85% 100%, rgba(212, 160, 86, 0.04), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .app {
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding:
+      max(6px, env(safe-area-inset-top))
+      10px
+      max(6px, env(safe-area-inset-bottom));
+  }
+
+  /* ─── Filter chip row ─── */
+  .chips {
+    display: flex;
+    gap: 6px;
+    padding: 4px 2px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+
+  .filter {
+    flex: 0 0 auto;
+    height: 28px;
+    padding: 0 11px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 14px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+  .filter:active { transform: scale(0.94); }
+  .filter.active {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+
+  /* ─── Card area ─── */
+  .card-area {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 4px 0;
+    perspective: 1800px;
+    min-height: 0;
+  }
+
+  .card {
+    width: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0.15, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.04) inset,
+      0 30px 60px -20px rgba(0,0,0,0.5),
+      0 8px 24px -8px rgba(0,0,0,0.3);
+  }
+
+  .face::-webkit-scrollbar { width: 0; display: none; }
+
+  .face.back {
+    transform: rotateY(180deg);
+    background: var(--card-elev);
+  }
+
+  /* Decorative corner mark */
+  .face.front::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 22px;
+    height: 22px;
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-top-right-radius: 12px;
+    pointer-events: none;
+  }
+  .face.back::before {
+    content: '';
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    width: 22px;
+    height: 22px;
+    border-bottom: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+    border-bottom-left-radius: 12px;
+    pointer-events: none;
+  }
+
+  /* Card meta chips on the card */
+  .meta {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .badge.spec {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+  }
+
+  /* Front content */
+  .question {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 60, "SOFT" 30;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.32;
+    letter-spacing: -0.005em;
+    color: var(--text);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6px 0;
+  }
+
+  .question code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    background: rgba(212, 160, 86, 0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .question strong {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .question em {
+    font-style: italic;
+    color: var(--text-dim);
+  }
+
+  .question svg {
+    margin: 8px 0;
+    color: var(--text-dim);
+  }
+
+  .question pre {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(255,255,255,0.04);
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin: 6px 0;
+    color: var(--text);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* Back content */
+  .answer {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .answer p { margin-bottom: 8px; }
+  .answer p:last-child { margin-bottom: 0; }
+
+  .answer strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .answer em {
+    font-style: italic;
+    color: var(--text-dim);
+  }
+
+  .answer ul, .answer ol {
+    margin: 4px 0 8px 18px;
+  }
+
+  .answer li {
+    margin-bottom: 3px;
+  }
+
+  .answer code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: rgba(255,255,255,0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent);
+    word-break: break-word;
+  }
+
+  .answer pre {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: rgba(255,255,255,0.04);
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin: 6px 0;
+    color: var(--text);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .answer h4 {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 30;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 13px;
+    margin: 10px 0 4px;
+    color: var(--accent);
+    letter-spacing: 0.005em;
+  }
+
+  .answer h4:first-child { margin-top: 0; }
+
+  .answer br + br { display: none; }
+
+  /* Hint */
+  .hint {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  /* Empty state */
+  .empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+  }
+  .empty.visible { display: flex; }
+  .empty-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .empty-text {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  /* ─── Bottom controls ─── */
+  .controls {
+    padding: 8px 2px 4px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 44px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 12px;
+    font-family: var(--serif);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+  }
+  .nav-btn:active {
+    transform: scale(0.94);
+    background: var(--border);
+  }
+  .nav-btn:disabled { opacity: 0.3; }
+  .nav-btn:disabled:active { transform: none; background: transparent; }
+
+  .shuffle-btn {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+  }
+  .shuffle-btn:active {
+    transform: scale(0.92);
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .counter {
+    flex: 1;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* Tighter on shorter phones */
+  @media (max-height: 700px) {
+    .question { font-size: 17px; }
+    .answer { font-size: 12.8px; }
+    .face { padding: 18px 16px 14px; }
+    .meta { margin-bottom: 10px; }
+  }
+
+  /* Reset button inside empty state */
+  .reset-btn {
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .reset-btn:active { background: #BC8F4A; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="chips" id="chips">
+    <button class="filter active" data-filter="ALL">ALL</button>
+    <button class="filter" data-filter="1.1">1.1</button>
+    <button class="filter" data-filter="1.2">1.2</button>
+    <button class="filter" data-filter="1.3">1.3</button>
+    <button class="filter" data-filter="1.4">1.4</button>
+    <button class="filter" data-filter="1.5">1.5</button>
+    <button class="filter" data-filter="1.6">1.6</button>
+    <button class="filter" data-filter="cross">cross</button>
+  </div>
+
+  <div class="card-area" id="cardArea">
+    <div class="card" id="card">
+      <div class="face front">
+        <div class="meta">
+          <span class="badge" id="typeBadge"></span>
+          <span class="badge spec" id="specBadge"></span>
+        </div>
+        <div class="question" id="questionText"></div>
+        <div class="hint">Tap to reveal</div>
+      </div>
+      <div class="face back">
+        <div class="meta">
+          <span class="badge" id="typeBadgeBack"></span>
+          <span class="badge spec" id="specBadgeBack"></span>
+        </div>
+        <div class="answer" id="answerText"></div>
+        <div class="hint">Tap to flip back</div>
+      </div>
+    </div>
+    <div class="empty" id="empty">
+      <div class="empty-title">No cards in this filter</div>
+      <div class="empty-text">Nothing matches the current chip.</div>
+      <button class="reset-btn" id="resetFilter">Reset to ALL</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="nav-btn" id="prev" aria-label="Previous">←</button>
+    <button class="shuffle-btn" id="shuffle" aria-label="Shuffle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+    </button>
+    <div class="counter" id="counter">0 / 0</div>
+    <button class="nav-btn" id="next" aria-label="Next">→</button>
+  </div>
+</div>
+
+<script>
+const cards = [
+// --- flashcards_1_1.js ---
+{
+    type: "Definition",
+    spec: "1.1.1",
+    front: `What is the <strong>purpose of the CPU</strong>?`,
+    back: `<p>The CPU <strong>processes data and instructions</strong> by carrying out the <strong>fetch–decode–execute (FDE) cycle</strong> continuously.</p><br><p><strong>Exam evidence:</strong> Likely 2026 stem: <em>"State the purpose of the CPU."</em> (1 mark). MS-style answer: <em>"Processes data and instructions / runs the fetch–execute cycle."</em></p>`
+  },
+  {
+    type: "Trace",
+    spec: "1.1.1",
+    front: `<strong>Describe what happens during the fetch–execute cycle.</strong> (2 marks)`,
+    back: `<p>Any two from:</p><p>• An <strong>instruction is fetched from memory/RAM</strong>.<br>• The instruction is then <strong>decoded</strong> (split into <strong>opcode + operand</strong>).<br>• The decoded instruction is then <strong>executed</strong>.<br>• The <strong>program counter is incremented</strong>.<br>• The <strong>ALU performs</strong> the logical/arithmetic calculations.</p><br><p><strong>Exam evidence:</strong> Jun24/Q6a (2 marks) — stem: <em>"Describe what happens during the fetch-execute cycle."</em> MS: any two of fetched from memory / decoded into opcode+operand / executed / ALU performs calculations / data stored using registers.</p>`
+  },
+  {
+    type: "Trace",
+    spec: "1.1.1",
+    front: `Put the FDE cycle in order using the registers: <br>PC, MAR, MDR, CIR, CU, ALU, ACC.`,
+    back: `<p>1. <strong>PC</strong> holds address of next instruction → copied to <strong>MAR</strong>.<br>2. Memory returns the instruction at MAR → placed in <strong>MDR</strong>.<br>3. <strong>PC is incremented</strong>.<br>4. Instruction in <strong>MDR is transferred to CIR</strong>.<br>5. <strong>CU decodes</strong> the instruction in the CIR.<br>6. <strong>ALU executes</strong> any arithmetic/logic → result stored in <strong>ACC</strong>. Cycle repeats.</p><br><p><strong>Exam evidence:</strong> SAMs/Q1d (2 marks) — stem: <em>"Identify two events that take place during the fetch-execute cycle."</em> MS: <em>"An instruction is fetched from memory; the instruction is then decoded; the decoded instruction is then executed."</em></p>`
+  },
+  {
+    type: "Compare",
+    spec: "1.1.1",
+    front: `<strong>CU vs ALU</strong> — which one <em>executes</em> the calculation, and which one <em>coordinates</em>?`,
+    back: `<p>• <strong>Control Unit (CU)</strong> — sends signals to <strong>synchronise / control / coordinate</strong> the processor and the FDE cycle; <strong>decodes</strong> instructions in the CIR. It does <strong>NOT</strong> perform calculations.<br>• <strong>Arithmetic Logic Unit (ALU)</strong> — <strong>performs the mathematical and logical calculations</strong> (e.g. add, subtract, AND, OR, compare).</p><br><p><strong>Exam evidence:</strong> Jun22/Q2 (4 marks) — fill-in-table. MS for CU: <em>"sends signals to synchronise/control/coordinate the processor/hardware/F–E cycle/flow of data // decodes instructions (in CIR)."</em> MS warning: <em>"sends signals to components"</em> alone is NOT enough.</p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.1.1",
+    front: `What does the <strong>Program Counter (PC)</strong> hold?`,
+    back: `<p>The PC <strong>stores the address of the next instruction to be fetched</strong> from memory. It <strong>increments during each fetch–execute cycle</strong>.</p><br><p><strong>Exam evidence:</strong> Jun22/Q2 (1 mark within 4) — stem: <em>"Stores the address of the next instruction to be fetched from memory. Increments in each fetch-execute cycle."</em> MS answer: <strong>Program Counter // PC</strong>. Also Jun24/Q6b and Jun25/Q6c accept this purpose verbatim.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "1.1.1",
+    front: `<strong>MAR vs MDR</strong> — which stores the <em>address</em> and which stores the <em>data</em>?`,
+    back: `<p>• <strong>MAR (Memory Address Register)</strong> — stores the <strong>address</strong> of the data/instruction to be fetched from, or where data is to be stored.<br>• <strong>MDR (Memory Data Register)</strong> — stores the <strong>data/instruction</strong> fetched from memory, or to be stored in memory.</p><p><em>Trap:</em> Jun22 examiner report flagged candidates swapping these. <strong>MAR = Address, MDR = Data.</strong></p><br><p><strong>Exam evidence:</strong> Jun22/Q2 (1 mark) — MAR row MS: <em>"Stores the address of the data to be fetched from, or the address where the data is to be stored."</em> Jun24/Q6b MDR MS: <em>"Stores the data/instruction fetched from memory."</em></p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.1.1",
+    front: `What does the <strong>Accumulator (ACC)</strong> do? And what about the <strong>CIR</strong>?`,
+    back: `<p>• <strong>ACC</strong> — <strong>stores the result of calculations</strong> / stores the result from the ALU / data currently being processed.<br>• <strong>CIR (Current Instruction Register)</strong> — <strong>stores the instruction currently being decoded/executed</strong>.</p><br><p><strong>Exam evidence:</strong> Jun25/Q6c (2 marks) — stem: <em>"Identify two registers and state the purpose of each register."</em> MS accepts: <em>"Accumulator // ACC — Stores the result of calculations / stores the result from the ALU"</em> and <em>"Current instruction register // CIR — Stores the instruction currently being executed."</em></p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.1.1",
+    front: `Define <strong>Von Neumann architecture</strong>.`,
+    back: `<p>A CPU design in which <strong>data and instructions are stored together in the same memory</strong> (the stored-program concept) and are accessed via the CPU's registers <strong>MAR, MDR, PC, ACC</strong> (and CIR).</p><br><p><strong>Exam evidence:</strong> Likely 2026 stem: <em>"State two features of Von Neumann architecture."</em> (2 marks). MS-style: <em>"Data and instructions are stored in the same memory; the CPU uses registers (MAR, MDR, PC, ACC) to fetch and execute them."</em> (Specification 1.1.1 names these four registers explicitly.)</p>`
+  },
+  {
+    type: "Concept",
+    spec: "1.1.2",
+    front: `What is <strong>cache</strong>, and why does it speed the CPU up?`,
+    back: `<p>Cache is a small amount of <strong>very fast memory inside (or very close to) the CPU</strong> that holds <strong>frequently used data and instructions</strong>. It is <strong>faster to transfer to and from cache than to and from RAM</strong>, so the CPU doesn't have to wait on slower main memory.</p><br><p><strong>Exam evidence:</strong> SAMs/Q1c (2 marks) — stem: <em>"Explain one reason why the cache size affects the performance of the CPU."</em> MS: <em>"Data is transferred faster (1) which makes the CPU more efficient (1)"</em> OR <em>"It is faster to transfer to and from cache (1) than transferring to and from RAM (1)."</em></p>`
+  },
+  {
+    type: "Concept",
+    spec: "1.1.2",
+    front: `What is <strong>clock speed</strong>, and what is one <em>limitation</em> of just cranking it up?`,
+    back: `<p><strong>Clock speed</strong> = the number of FDE cycles the CPU can carry out <strong>per second</strong>, measured in <strong>Hz / GHz</strong>. Higher clock speed = more instructions executed per second.</p><p><em>Limitation:</em> higher clock speeds produce <strong>more heat</strong> and use more power, so the CPU may throttle/become unstable.</p><br><p><strong>Exam evidence:</strong> Jun24/Q6c (3 marks) — stem: <em>"Give three characteristics of a CPU that can affect its performance."</em> MS: <em>"Clock speed / Cache size / Number of cores."</em> ER warning: "clock" alone is NE (not enough) — must say <strong>clock speed</strong>.</p>`
+  },
+  {
+    type: "Concept",
+    spec: "1.1.2",
+    front: `How does <strong>cache size</strong> affect CPU performance?`,
+    back: `<p>A <strong>larger cache</strong> stores more frequently used data/instructions close to the CPU, so <strong>data is transferred faster</strong>, which <strong>makes the CPU more efficient</strong>. It is <strong>faster to transfer to and from cache than to and from RAM</strong>.</p><br><p><strong>Exam evidence:</strong> SAMs/Q1c (2 marks) — MS: <em>"data is transferred faster (1)… which makes a CPU more efficient (1) // It is faster to transfer to and from cache (1)… than transferring to and from RAM (1)."</em> Trap: write "cache size", not just "cache" (Jun24 ER).</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "1.1.2",
+    front: `Computer 1 has a <strong>lower clock speed</strong> but <strong>more cores</strong> than Computer 2. Why might Computer 1 still be faster?`,
+    back: `<p>Computer 1 has <strong>more cores</strong>, so it can <strong>process more than one instruction/program at the same time</strong> (or split a program into processes that can be carried out concurrently).</p><p><em>Nuance:</em> the software must be <strong>multi-threaded</strong> to actually use the extra cores — single-threaded software only uses one core.</p><br><p><strong>Exam evidence:</strong> SAMs/Q1a (1 mark) — stem: <em>"Computer 1 is likely to run faster than Computer 2. Identify one reason."</em> MS: <em>"It has more cores"</em> / <em>"splitting a program into processes that can be carried out consecutively will be accepted."</em></p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.1.3",
+    front: `Define an <strong>embedded system</strong>.`,
+    back: `<p><strong>"A computer system that is built into another (larger) device"</strong> to perform a specific/dedicated task.</p><br><p><strong>Exam evidence:</strong> SAMs/Q3b (1 mark) — stem: <em>"The Sat Nav contains an embedded system. Define what is meant by an 'embedded system'."</em> MS: <em>"A computer system that is built into another device."</em></p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.1.3",
+    front: `A car's <strong>"Follow Me"</strong> cruise control is an embedded system. Give <strong>three reasons</strong> why. (3 marks)`,
+    back: `<p>Any three from:</p><p>• Has a <strong>specific purpose</strong> / only performs one task (cruise control).<br>• <strong>Built within a larger device</strong> (the car) — don't use this if question already says it.<br>• <strong>Dedicated hardware / sensors</strong> for this system.<br>• Has a <strong>microprocessor</strong>.<br>• <strong>Built-in operating system / firmware</strong> in ROM — instructions cannot easily be changed.<br>• It is a <strong>control system / automated</strong>.</p><br><p><strong>Exam evidence:</strong> Jun24/Q7a (3 marks) — stem: <em>"Explain the reasons why the 'Follow Me' system is an example of an embedded system."</em> MS lists exactly the points above.</p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.1.3",
+    front: `Name <strong>three devices</strong> (other than a Sat Nav) that contain <strong>embedded systems</strong>.`,
+    back: `<p>Any three from: <strong>washing machine, dishwasher, microwave, MP3 player, mobile phone, manufacturing equipment / robots, traffic-light controller, smart TV, smart thermostat</strong>, or in-car systems (parking sensors, lane assist, engine management, dashcam).</p><br><p><strong>Exam evidence:</strong> SAMs/Q3c (3 marks) — stem: <em>"Identify three devices, other than a Sat Nav, which contain embedded systems."</em> MS: <em>"Dishwasher / MP3 player / Washing machine / Mobile phone / Manufacturing equipment"</em> (any three). Tip: match the example to the scenario (Jun23 ER — don't give a washing machine if the scenario is a car).</p>`
+  },
+// --- flashcards_1_2.js ---
+{ type: "Compare", spec: "1.2.1", front: `<strong>RAM vs ROM</strong> — state the difference.`, back: `<p><strong>RAM is volatile</strong> (contents lost when power is removed); <strong>ROM is non-volatile</strong> (contents retained when power is removed). <strong>RAM can be read from and written to</strong>; <strong>ROM can only be read from</strong>.</p><p>RAM holds data/software/OS <em>currently in use</em>; ROM holds the <strong>boot-up instructions / BIOS / bootloader</strong>.</p><br><strong>Exam evidence:</strong> Jun22/Q7a i (1 mark) — "State the difference between RAM and ROM." ER warns: "RAM is volatile" alone is <em>not enough</em> — must contrast with ROM. Also SAMs/Q3a (tick-box: "Stores the boot up sequence" → ROM).` },
+
+  { type: "Definition", spec: "1.2.1", front: `Give <strong>two examples</strong> of data stored in <strong>RAM</strong> in a smart TV.`, back: `<p>Any two of:</p><ul><li>Parts of the <strong>operating system currently running</strong></li><li>The <strong>app/program currently being used</strong></li><li>The <strong>part of the TV programme currently being watched / buffered</strong></li><li>User settings / data currently being processed</li></ul><br><strong>Exam evidence:</strong> Jun22/Q7a ii (2 marks). ER trap: do <em>not</em> say "a TV programme" — say "the part currently being watched/buffered" (RAM only holds what's in use).` },
+
+  { type: "Concept", spec: "1.2.1", front: `What is <strong>virtual memory</strong> and when is it used?`, back: `<p>Virtual memory is a <strong>section of secondary storage</strong> that is <strong>used as if it were RAM</strong>, used <strong>when RAM is full / nearly full</strong>.</p><ol><li>Data <strong>not currently in use</strong> is moved from <strong>RAM into virtual memory</strong>.</li><li>When that data is needed again, it is <strong>transferred back to RAM</strong>.</li><li>VM is <strong>slower than RAM</strong> because secondary storage has slower access times.</li></ol><br><strong>Exam evidence:</strong> Jun23/Q5a iii (pattern, 3 marks). ER trap: students wrote "primary storage is partitioned" — wrong, it's <strong>secondary</strong> storage.` },
+
+  { type: "Definition", spec: "1.2.2", front: `Define <strong>secondary storage</strong> and name the <strong>three types</strong>.`, back: `<p><strong>Secondary storage</strong> = <strong>long-term / non-volatile storage of data and files</strong>. External/auxiliary; used to store data and programs permanently when the computer is turned off.</p><p>Three types: <strong>optical</strong>, <strong>magnetic</strong>, <strong>solid state</strong>.</p><br><strong>Exam evidence:</strong> SAMs/Q2a (1 mark) — "Define secondary storage." MS: "long term/non-volatile storage of data/files." SAMs/Q2b (3 marks) — names the three types.` },
+
+  { type: "Compare", spec: "1.2.2", front: `Name <strong>four characteristics</strong> to compare secondary storage devices.`, back: `<p>Any four of: <strong>capacity, speed, portability, durability, reliability, cost</strong>.</p><p>Match to scenario:</p><ul><li>Portable + durable (photographer in the field) → <strong>solid state</strong> (no moving parts).</li><li>Cheap mass distribution of film → <strong>optical</strong>.</li><li>Huge cheap backup → <strong>magnetic</strong> (HDD/tape).</li></ul><br><strong>Exam evidence:</strong> SAMs/Q2c (4 marks) — MS lists exactly: capacity, speed, portability, durability, reliability, cost. Jun24/Q3b ii — musician choosing between magnetic and solid state (justify on capacity/portability/durability).` },
+
+  { type: "Calc", spec: "1.2.3", front: `Match <strong>2000 bytes</strong> to its equivalent unit: 2 kB, 2 MB, 2 GB, 2 TB or 2 PB?`, back: `<p><strong>2000 bytes = 2 kilobytes (kB)</strong> (using ÷1000).</p><p>Ladder (×1000 each step): <strong>bit → nibble (4) → byte (8) → kB → MB → GB → TB → PB</strong>. OCR uses ÷1000 by default but accepts ÷1024.</p><br><strong>Exam evidence:</strong> Jun22/Q1a (4 marks) — tick-box matching file sizes to units (e.g. 2000 TB = 2 PB).` },
+
+  { type: "Calc", spec: "1.2.4", front: `Convert <strong>11001011</strong> to denary. <svg viewBox="0 0 240 18" xmlns="http://www.w3.org/2000/svg"><text x="0" y="14" font-size="12" font-family="monospace" fill="currentColor">128 64 32 16  8  4  2  1</text></svg>`, back: `<p>Place-value method:</p><pre>128  64  32  16   8   4   2   1
+ 1    1   0   0   1   0   1   1</pre><p>= 128 + 64 + 8 + 2 + 1 = <strong>203</strong></p><br><strong>Exam evidence:</strong> SAMs/Q5a (1 mark) — "Convert the binary number 11001011 into denary." MS: <strong>203</strong> (correct answer only).` },
+
+  { type: "Calc", spec: "1.2.4", front: `Convert the denary number <strong>221</strong> to 8-bit binary. Show your working.`, back: `<p>Subtract from highest place value:</p><pre>128  64  32  16   8   4   2   1
+ 1    1   0   1   1   1   0   1</pre><p>221 − 128 = 93 → 93 − 64 = 29 → 29 < 32 (0) → 29 − 16 = 13 → 13 − 8 = 5 → 5 − 4 = 1 → 1 < 2 (0) → 1 − 1 = 0.</p><p>Answer: <strong>11011101</strong></p><br><strong>Exam evidence:</strong> Jun22/Q1b (2 marks). ER trap: writing place values back-to-front (1,2,4,8…) gives a reversed answer. 1 mark for working, 1 for answer.` },
+
+  { type: "Calc", spec: "1.2.4", front: `Convert <strong>156</strong> to 8-bit binary (Jun25 table).`, back: `<pre>128  64  32  16   8   4   2   1
+ 1    0   0   1   1   1   0   0</pre><p>156 − 128 = 28 → 28 < 64 (0) → 28 < 32 (0) → 28 − 16 = 12 → 12 − 8 = 4 → 4 − 4 = 0 → 0 < 2 (0) → 0 (0).</p><p>Answer: <strong>10011100</strong></p><br><strong>Exam evidence:</strong> Jun25/Q5b row — denary <strong>156</strong> ↔ binary <strong>10011100</strong> (table also expects 2-digit hex <strong>9C</strong>: 1001=9, 1100=12=C).` },
+
+  { type: "Calc", spec: "1.2.4", front: `Complete the binary addition. Show carries.<pre>  0 1 1 1 0 0 1 1
++ 0 0 1 1 0 1 0 0</pre>`, back: `<pre>     1 1 1            (carries)
+  0 1 1 1 0 0 1 1
++ 0 0 1 1 0 1 0 0
+-----------------
+  1 0 1 0 0 1 1 1</pre><p>Answer: <strong>10100111</strong> (= 167 denary). Fits in 8 bits — <strong>no overflow</strong>.</p><p>Overflow rule: if the result needs more than 8 bits, state "an <strong>overflow error</strong> has occurred because the result requires more than 8 bits."</p><br><strong>Exam evidence:</strong> Jun25/Q5c (2 marks); same addition pattern in SAMs/Q4 and Jun24/Q1e (01101011 + 00001111). ER: adding via denary loses the working mark — do it <strong>in binary</strong>.` },
+
+  { type: "Calc", spec: "1.2.4", front: `Perform a <strong>2-place right binary shift</strong> on <strong>01110111</strong>.`, back: `<p>Shift each bit 2 places right; fill from the left with 0s; bits falling off the right are lost.</p><pre>Before: 0 1 1 1 0 1 1 1
+After:  0 0 0 1 1 1 0 1</pre><p>Answer: <strong>00011101</strong></p><p>A right shift of <em>n</em> = ÷ 2ⁿ. Watch out: bits falling off the right cause <strong>loss of precision</strong> (odd numbers truncate).</p><br><strong>Exam evidence:</strong> Jun25/Q5d (1 mark, tick-box) — answer <strong>00011101</strong>. Also Jun22/Q1f (3-place right on 10001110) and SAMs/Q5b (2-place right on 11001011 = 00110010).` },
+
+  { type: "Calc", spec: "1.2.4", front: `Describe the binary shift used to <strong>multiply by 8</strong>.`, back: `<p>A <strong>left shift</strong> (1 mark) of <strong>3 places</strong> (1 mark).</p><p>Because 2³ = 8. Left shift by <em>n</em> multiplies by 2ⁿ.</p><p>Example: <code>00000101</code> (5) &lt;&lt; 3 = <code>00101000</code> (40).</p><br><strong>Exam evidence:</strong> Jun25/Q5e (2 marks). ER trap: students give the direction <em>or</em> the number of places — both are needed for full marks.` },
+
+  { type: "Calc", spec: "1.2.4", front: `Convert the hexadecimal number <strong>2F</strong> to denary. Show your working.`, back: `<p>Method 1 (multiply): <strong>2 × 16 = 32</strong>; <strong>F = 15</strong>; 32 + 15 = <strong>47</strong>.</p><p>Method 2 (via binary): 2 = 0010, F = 1111 → <code>00101111</code> → 32+8+4+2+1 = <strong>47</strong>.</p><p>Hex letters: A=10, B=11, C=12, D=13, E=14, F=15.</p><br><strong>Exam evidence:</strong> Jun22/Q1c (2 marks). ER trap: writing F = 1101 (it's 1111) — common slip.` },
+
+  { type: "Calc", spec: "1.2.4", front: `Convert binary <strong>10110000</strong> to hexadecimal.`, back: `<p>Split into nibbles <strong>from the right</strong>:</p><p><code>1011</code> = 11 = <strong>B</strong>; <code>0000</code> = 0 = <strong>0</strong>.</p><p>Answer: <strong>B0</strong></p><br><strong>Exam evidence:</strong> Jun22/Q1d (1 mark). ER trap: writing just <code>B</code> instead of <code>B0</code> — the trailing zero matters because it's the lower nibble.` },
+
+  { type: "Concept", spec: "1.2.4", front: `How is the word <strong>"MOP"</strong> represented using ASCII (L=76, M=77, N=78, O=79, P=80)?`, back: `<p>Each character has a <strong>unique ASCII code</strong> stored in the order written; the code is converted to an <strong>8-bit binary number</strong>.</p><p>M = 77 = <code>01001101</code> · O = 79 = <code>01001111</code> · P = 80 = <code>01010000</code></p><p>"MOP" = <code>01001101 01001111 01010000</code></p><br><strong>Exam evidence:</strong> SAMs/Q6 (3 marks). MS: each character of MOP has its ASCII code stored in order (77 79 80); each code converted to 8-bit binary. Same pattern Jun25/Q6a ("POP").` },
+
+  { type: "Compare", spec: "1.2.4", front: `Identify one <strong>benefit</strong> and one <strong>drawback</strong> of using <strong>Unicode</strong> instead of <strong>ASCII</strong>.`, back: `<p><strong>Benefit:</strong> Unicode can represent <strong>characters from many different languages</strong> (or emojis) — ASCII only covers English letters/digits/punctuation.</p><p><strong>Drawback:</strong> Unicode files are <strong>larger</strong> — Unicode uses <strong>16+ bits per character</strong> vs ASCII's 7/8 bits — so it requires more storage.</p><br><strong>Exam evidence:</strong> Jun25/Q6b (2 marks).` },
+
+  { type: "Calc", spec: "1.2.4", front: `Calculate the file size of <strong>10 images</strong>, each <strong>800 × 500</strong> pixels at <strong>8-bit</strong> colour depth, in kilobytes. Show working.`, back: `<p>Per image:</p><ol><li>Pixels: 800 × 500 = <strong>400,000</strong></li><li>Bits: 400,000 × 8 = <strong>3,200,000 bits</strong></li><li>Bytes: ÷ 8 = <strong>400,000 bytes</strong></li><li>kB: ÷ 1,000 = <strong>400 kB</strong></li></ol><p>For 10 images: 400 × 10 = <strong>4,000 kB</strong>.</p><p>Formula: <strong>file size (bits) = width × height × colour depth</strong>; then <strong>÷8 → bytes; ÷1000 → kB</strong>.</p><br><strong>Exam evidence:</strong> Jun25/Q1b ii (2 marks). MS accepts ÷1024 (final answer 3906.25 kB). ER: always show bits → ÷8 → bytes → ÷1000 → kB.` },
+
+  { type: "Concept", spec: "1.2.4", front: `Effect of <strong>increasing the sample rate</strong> when recording sound?`, back: `<p>Two effects:</p><ul><li>The <strong>quality / accuracy will improve</strong> (the digital sample more closely matches the analogue wave).</li><li>The <strong>file size will increase</strong>.</li></ul><p>Sample rate (Hz) = samples per second. File size (bits) = sample rate × sample size × seconds × channels.</p><br><strong>Exam evidence:</strong> SAMs/Q4b (2 marks). MS: "quality will improve (1); file size will increase (1)." ER (Jun24): students confuse sample rate (samples/sec) with bit depth (bits/sample).` },
+
+  { type: "Calc", spec: "1.2.4", front: `Calculate the file size of a <strong>60-second</strong> mono recording at <strong>44,100 Hz</strong> sample rate × <strong>16-bit</strong> sample size. Give the answer in kB.`, back: `<ol><li>Bits/sec (bit rate): 44,100 × 16 = <strong>705,600 bits/sec</strong></li><li>Total bits: 705,600 × 60 = <strong>42,336,000 bits</strong></li><li>Bytes: ÷ 8 = <strong>5,292,000 bytes</strong></li><li>kB: ÷ 1,000 = <strong>5,292 kB</strong> (≈ 5.3 MB)</li></ol><p>Formula: <strong>bits = sample rate × sample size × seconds × channels</strong>; then ÷8 → bytes, ÷1000 → kB. Stereo (2 channels) doubles it.</p><br><strong>Exam evidence:</strong> Representative 2026 stem — same calculation pattern as Jun22/Q6a (sound file size) and the Jun25/Q4 sampling theory. ER (Jun24): don't confuse sample rate with bit depth.` },
+
+  { type: "Compare", spec: "1.2.5", front: `Give <strong>two benefits</strong> of compressing files before emailing them.`, back: `<p>Any two of:</p><ul><li><strong>Reduces file size</strong> / takes up less storage</li><li><strong>Faster to transmit / upload / download</strong></li><li>Uses <strong>less bandwidth</strong></li><li>May otherwise <strong>exceed email attachment / storage limits</strong></li></ul><br><strong>Exam evidence:</strong> Jun22/Q6d i (2 marks).` },
+
+  { type: "Misconception", spec: "1.2.5", front: `Explain why <strong>lossy</strong> compression is <strong>not appropriate</strong> for text documents.`, back: `<p>Lossy compression <strong>permanently removes data</strong>; text files require <strong>all characters to be present</strong>, otherwise the text would <strong>lose its meaning / be unreadable</strong>. Therefore <strong>lossless</strong> must be used (lossless = "no data is lost / file can be perfectly reconstructed").</p><p>Use lossy for images/audio/video where some loss is unnoticeable; use lossless for text/code/executables.</p><br><strong>Exam evidence:</strong> Jun22/Q6d ii (2 marks). MS: "lossy permanently removes data; text needs all characters present to be readable."` },
+// --- flashcards_1_3.js ---
+{
+    type: "Compare",
+    spec: "1.3.1",
+    front: `<strong>LAN vs WAN</strong> — what's the trap the mark scheme keeps catching students on?`,
+    back: `<p><strong>LAN</strong>: covers a <em>small geographical area</em> / single building; uses <strong>dedicated hardware owned by the organisation</strong>; no external infrastructure; devices communicate using MAC addresses.</p><p><strong>WAN</strong>: <em>geographically remote</em> / spans large distance; the <strong>communication medium is NOT owned by the organisation</strong> (uses third-party infrastructure e.g. telecom lines).</p><p><strong>Trap:</strong> "a network over a wide area" is explicitly REJECTED by the mark scheme — must mention ownership or geographic remoteness.</p><strong>Exam evidence:</strong> SAMs/Q10a (1 mark) — define WAN. Jun25/Q4a (2 marks) — two reasons it's a LAN not a WAN: small area / no external infrastructure / dedicated hardware.`
+  },
+  {
+    type: "Concept",
+    spec: "1.3.1",
+    front: `Name <strong>five factors</strong> that affect network performance and what each one does.`,
+    back: `<ol><li><strong>Bandwidth</strong> — max data transferable per second; more bandwidth = faster transmission / more data per second.</li><li><strong>Number of users/devices</strong> — bandwidth is <strong>split between devices</strong>, so each gets less; more collisions and retransmissions.</li><li><strong>Transmission media</strong> — fibre &gt; copper &gt; wireless for speed/reliability.</li><li><strong>Interference</strong> (wireless) — causes data loss, collisions, retransmissions.</li><li><strong>Latency</strong> — delay between sending and receiving; devices wait longer before they can transmit.</li></ol><strong>Exam evidence:</strong> Jun22/Q3a(i) (3 marks) — why more devices slows the network: bandwidth split / increased latency / more collisions → retransmissions. Jun25/Q4c(ii) (4 marks) — bandwidth + users table.`
+  },
+  {
+    type: "Compare",
+    spec: "1.3.1",
+    front: `<strong>Client–server vs Peer-to-peer</strong> — give one advantage of each.`,
+    back: `<p><strong>Client–server</strong>: dedicated server provides services; clients request them. <em>Adv</em>: centrally managed (backups, security, user accounts). <em>Disadv</em>: server is a <strong>single point of failure</strong>; expensive; needs specialist staff.</p><p><strong>Peer-to-peer</strong>: all computers are equal — each acts as client and server. <em>Adv</em>: cheap, no specialist staff, no single point of failure. <em>Disadv</em>: no central backup/security; performance drops as more peers added.</p><strong>Exam evidence:</strong> Representative — "State one advantage of a client-server network" (1 mark) — MS: centralised security / easier backups / central updates.`
+  },
+  {
+    type: "Definition",
+    spec: "1.3.1",
+    front: `What does each network device do? <strong>Switch · Router · WAP · NIC</strong>`,
+    back: `<ul><li><strong>Switch</strong>: connects devices on a LAN; <strong>forwards frames to the destination device using its MAC address</strong> (held in a table). Does NOT store data.</li><li><strong>Router</strong>: <strong>forwards packets between networks</strong>; maintains a routing table; identifies the most efficient path; <strong>assigns IP addresses</strong> to devices (DHCP); uses IP addresses.</li><li><strong>WAP (Wireless Access Point)</strong>: allows wireless devices to connect to a wired network.</li><li><strong>NIC</strong>: hardware interface that connects a device to a network; holds the device's MAC address.</li></ul><strong>Exam evidence:</strong> Jun22/Q3d (3 marks) — three router tasks: receive packets / forward packets / maintain routing table / assign IPs. Jun24/Q2c(iii) (3 marks) — role of switch.`
+  },
+  {
+    type: "Trace",
+    spec: "1.3.1",
+    front: `Walk through what happens when Nicole types <code>tiktok.com</code> into her browser. Where does DNS fit?`,
+    back: `<p><strong>DNS lookup steps:</strong></p><ol><li>User enters the URL into the browser's address bar.</li><li>Browser checks its <strong>local cache</strong> for a matching IP address.</li><li>If not cached, the URL/domain name is sent to a <strong>DNS server</strong>.</li><li>The DNS server looks up the URL in its <strong>table/database</strong> of URL→IP mappings.</li><li>If not found, the request is passed to a <strong>higher-level DNS</strong> (root → TLD → authoritative).</li><li>The DNS server <strong>returns the IP address to the browser/computer</strong>.</li><li>The browser sends a request to that IP for the webpage (or returns an error if not found).</li></ol><p>DNS = "converts a domain name into an IP address" — NOT "finds the website".</p><strong>Exam evidence:</strong> Jun25/Q4e(iii) (4 marks) — describe DNS lookup steps; MS awards 1 mark per correct step up to 4. MS rejects "user" alone for the return step — must say <em>browser/computer</em>.`
+  },
+  {
+    type: "Concept",
+    spec: "1.3.1",
+    front: `<strong>Star topology</strong> — sketch + one advantage + one disadvantage.`,
+    back: `<p>Every device is directly connected to a <strong>central switch</strong>. Data goes device → switch → only to destination (using MAC).</p><p><strong>Advantages</strong>: easy to add a new node; if one cable/computer breaks the rest of the network still works; fewer collisions; faster transmission (no broadcast to all).</p><p><strong>Disadvantages</strong>: if the <strong>central switch fails the whole network fails</strong> (single point of failure); extra cost of central device + cabling to each node.</p><strong>Exam evidence:</strong> SAMs/Q7c (2 marks) — two reasons bakery may use star: easy to add nodes / fault doesn't bring down network / fewer collisions. Jun24/Q2c(i) (3 marks) — draw star with 5 PCs + 2 printers + 1 switch, all labelled, all connected to switch only.`
+  },
+  {
+    type: "Concept",
+    spec: "1.3.1",
+    front: `<strong>Mesh topology</strong> — describe it, then give one adv + one disadv.`,
+    back: `<p>Every node connects to <strong>multiple other nodes</strong> (partial mesh) or to <strong>every other node</strong> (full mesh). No central switch; decentralised; <strong>multiple routes between devices</strong>. Each node can act as a repeater.</p><p><strong>Advantages</strong>: <strong>no single point of failure</strong> — data takes another route if one connection breaks; more robust/resilient; no central switch needed; scalable; decreased latency.</p><p><strong>Disadvantages</strong>: <strong>large number of connections/wires</strong> — expensive; less central management; less secure (more attack points); difficult to find errors; uses more power.</p><strong>Exam evidence:</strong> Jun25/Q4b(i) (2 marks) — describe mesh. Jun25/Q4b(ii) (4 marks) — benefit + drawback of mesh vs star.`
+  },
+  {
+    type: "Scenario",
+    spec: "1.3.1",
+    front: `The law firm is considering moving its files to <strong>the cloud</strong>. Give two pros and two cons (contextualised).`,
+    back: `<p><strong>Cloud = storage/services on remote servers accessed over the internet</strong>, managed by a third party.</p><p><strong>Advantages</strong>: access files from anywhere/any device; scalable storage with no hardware to buy; automatic backups by provider; no specialist IT staff; allows remote working/collaboration.</p><p><strong>Disadvantages</strong>: needs a <strong>constant internet connection</strong>; ongoing subscription cost; <strong>no control over security</strong> — rely on provider; may be hacked / data intercepted; may lose access if provider goes down; <strong>unclear where data is stored geographically — GDPR/DPA implications</strong>.</p><strong>Exam evidence:</strong> SAMs/Q10b–c (4 + 4 marks) — two advantages and two disadvantages of cloud for the law firm; MS caps at 1 mark per point if not contextualised. Jun25/Q4d (5 marks) — describe cloud drawbacks.`
+  },
+  {
+    type: "Compare",
+    spec: "1.3.1",
+    front: `<strong>Wired vs Wireless</strong> — give the two biggest wins for each.`,
+    back: `<p><strong>Wired (Ethernet/fibre)</strong>: higher/more consistent bandwidth; more reliable, little interference; more secure (physical access needed to intercept).</p><p><strong>Wireless (Wi-Fi)</strong>: devices can <strong>move around</strong>; works with devices that <strong>don't have ports</strong> (phones, tablets, IoT); cheap to add new devices.</p><p><strong>Trap (ER Jun2024)</strong>: "wireless is cheaper because no cables" was REJECTED when wired infrastructure already existed — wired cabling is already paid for. "Faster" alone is also NE — must say faster transmission / higher bandwidth.</p><strong>Exam evidence:</strong> Jun24/Q2b(i)/(ii) (4 + 4 marks) — benefits of wired and why also allow wireless (contextualised to airport).`
+  },
+  {
+    type: "Definition",
+    spec: "1.3.1",
+    front: `Give a valid <strong>IPv4</strong> address and describe IPv6.`,
+    back: `<p><strong>IPv4</strong>: a <strong>logical address</strong> assigned to a device on a network. Format = <strong>4 groups of denary numbers 0–255 separated by full stops</strong> (e.g. <code>192.168.0.1</code>). Trap: any group &gt; 255 is invalid (e.g. <code>258.0.0.3</code> ✗); must have exactly 4 groups (<code>56.1.2.66.1</code> ✗).</p><p><strong>IPv6</strong>: introduced because of <strong>IPv4 address exhaustion</strong>. <strong>128-bit</strong> address (vs 32-bit IPv4) — 8 groups of hex 0–FFFF separated by <strong>colons</strong>, e.g. <code>2001:0db8::1</code>.</p><p>IP is assigned by the router/DHCP and <strong>changes</strong> when device joins a different network.</p><strong>Exam evidence:</strong> Jun24/Q2a(i) (2 marks) — give one valid IP. Jun25/Q4e(ii) (4 marks) — identify invalid IPs and explain why.`
+  },
+  {
+    type: "Definition",
+    spec: "1.3.1",
+    front: `Describe the <strong>format of a MAC address</strong>.`,
+    back: `<p><strong>MAC address</strong> = a hardware/physical address assigned by the <strong>manufacturer</strong> to the <strong>NIC</strong>.</p><ul><li><strong>48 bits</strong> long.</li><li>Written as <strong>6 pairs/groups of hexadecimal</strong> digits (e.g. <code>00:1A:2B:3C:4D:5E</code>).</li><li>Separated by <strong>colons or hyphens</strong>.</li><li>First half = <strong>manufacturer ID (OUI)</strong>; second half = <strong>device serial number</strong>.</li><li><strong>Unique</strong> to the device; <strong>does not change</strong>.</li><li>Used by switches within a <strong>LAN</strong> (Link layer).</li></ul><strong>Exam evidence:</strong> Jun24/Q2a(ii) (2 marks) — describe MAC format. MS: hex / 6 groups / 48 bits / colons or hyphens / manufacturer ID + serial.`
+  },
+  {
+    type: "Misconception",
+    spec: "1.3.1",
+    front: `Why use <strong>encryption</strong> on a network — and what does it NOT do?`,
+    back: `<p><strong>Encryption</strong> <strong>scrambles/jumbles data using a key/algorithm</strong> so that <strong>if intercepted it is meaningless</strong> without the key.</p><p>Reasons to use it: data cannot be understood if intercepted; only <strong>authorised users with the key</strong> can access confidential/personal data; to follow legislation (<strong>DPA / GDPR</strong>).</p><p><strong>Critical trap (ER Jun2022)</strong>: encryption does <strong>NOT prevent data from being intercepted</strong> — it only makes intercepted data useless. Many candidates lose this mark by writing "stops hackers reading the data while it's being sent" without acknowledging interception still happens.</p><strong>Exam evidence:</strong> Jun22/Q3e (2 marks) — two reasons the library should use encryption. MS: data unreadable if intercepted / only authorised users with the key / follow DPA.`
+  },
+  {
+    type: "Concept",
+    spec: "1.3.2",
+    front: `Match each protocol to its job: <strong>TCP, IP, HTTP, HTTPS, FTP, POP, IMAP, SMTP</strong>.`,
+    back: `<ul><li><strong>TCP</strong> — splits data into <strong>packets</strong>, reassembles at the destination; reliable delivery (Transport).</li><li><strong>IP</strong> — <strong>addresses and routes packets</strong> between networks (Internet).</li><li><strong>HTTP</strong> — requesting/transmitting <strong>web pages</strong> (unencrypted).</li><li><strong>HTTPS</strong> — <strong>secure</strong> web pages (encrypted with TLS/SSL).</li><li><strong>FTP</strong> — <strong>uploading and downloading files</strong>.</li><li><strong>SMTP</strong> — <strong>sending</strong> email.</li><li><strong>POP</strong> — receiving email: <strong>downloads to device and deletes from server</strong>.</li><li><strong>IMAP</strong> — receiving email: <strong>keeps emails on the server</strong> (syncs across devices).</li></ul><p>Traps: HTTP ≠ HTTPS (the S = encryption — ER Jun2022). POP ≠ SMTP (POP/IMAP RECEIVE, SMTP SENDS).</p><strong>Exam evidence:</strong> Jun22/Q3f (2 marks) — send email = SMTP; secure website = HTTPS. Jun23/Q2a(i) (4 marks) — match protocols to tasks.`
+  },
+  {
+    type: "Concept",
+    spec: "1.3.2",
+    front: `Name the <strong>4 layers</strong> of the TCP/IP model and give one reason why protocols are layered.`,
+    back: `<p><strong>The 4 layers (top → bottom):</strong></p><ol><li><strong>Application</strong> — network services for user apps (HTTP, HTTPS, FTP, SMTP, POP, IMAP).</li><li><strong>Transport</strong> — splits data into packets, reassembles, error checks (TCP).</li><li><strong>Internet (Network)</strong> — addresses and routes packets between networks using IP addresses (IP).</li><li><strong>Link / Network Access</strong> — physical transmission over cables/Wi-Fi; uses MAC addresses (Ethernet, Wi-Fi).</li></ol><p><strong>Why use layers?</strong> Each layer is <strong>self-contained / independent</strong>; <strong>one layer can be changed without affecting others</strong>; allows <strong>standards</strong> so different manufacturers' hardware/software are compatible; makes <strong>troubleshooting</strong> easier (isolate problem to a layer); developers can specialise.</p><strong>Exam evidence:</strong> SAMs/Q7b(i) (1 mark) — define a layer = "a division of network functionality". SAMs/Q7b(ii) (2 marks) + Jun23/Q2a(ii) (2 marks) — advantages of layers.`
+  },
+// --- flashcards_1_4.js ---
+{ type: "Compare", spec: "1.4", front: `<strong>Virus</strong> vs <strong>worm</strong> — what's the key difference?`, back: `<p><strong>Virus</strong>: attaches to a <strong>host file</strong>; needs the <strong>user to run/open</strong> the host to activate, then replicates into other files.</p><p><strong>Worm</strong>: <strong>self-replicates across a network</strong> with <strong>no user action</strong> and no host file — uses up bandwidth.</p><br><strong>Exam evidence:</strong> Jun23/Q4b (3 marks) — name and describe a threat. MS: virus "replicates/spreads, deletes/corrupts data, allows unauthorised access"; worm "replicates across a network… uses up all the bandwidth".` },
+
+  { type: "Definition", spec: "1.4", front: `What is a <strong>trojan</strong>?`, back: `<p>Malware <strong>disguised as legitimate software</strong>. Once installed it acts like a virus — e.g. deletes files or allows unauthorised access.</p><p>Unlike a virus/worm, it does not replicate itself — it relies on the user installing it under false pretences.</p><br><strong>Exam evidence:</strong> Jun23/Q4b — MS accepts "malware disguised as legitimate software. Once installed acts as a virus… e.g. deleting files / allows unauthorised access".` },
+
+  { type: "Definition", spec: "1.4", front: `What is <strong>spyware</strong>? Give an example sub-type.`, back: `<p>Malware that runs <strong>hidden</strong> and <strong>secretly collects user information</strong> (passwords, browsing activity) and sends it to the attacker.</p><p>Example sub-type: a <strong>keylogger</strong> — records every keystroke.</p><br><strong>Exam evidence:</strong> Jun22/Q5 — MS phrasing "scans for / identifies spyware / keylogger… secretly collects user information". <em>Trap:</em> ER Jun23 — keylogger does NOT count if the Q says "another threat not spyware".` },
+
+  { type: "Misconception", spec: "1.4", front: `Define <strong>ransomware</strong>.`, back: `<p>Malware that <strong>encrypts / locks access to</strong> files on the victim's computer and <strong>demands a payment / fee / ransom money</strong> for the decryption key.</p><p><strong>Trap:</strong> writing "ransom" alone = 0. Must mention <strong>paying / money / fee</strong>.</p><br><strong>Exam evidence:</strong> Jun23/Q4b (3 marks) — model answer: "Ransomware (1) encrypts/locks access to data (1) demands payment to decrypt (1)". MS rejects "ransom" without payment language.` },
+
+  { type: "Definition", spec: "1.4", front: `What is <strong>phishing</strong>?`, back: `<p>Fraudulent <strong>emails / messages / websites</strong> impersonating a legitimate organisation, tricking the user into clicking a link and <strong>giving away personal data</strong> (credentials, bank details).</p><br><strong>Exam evidence:</strong> Jun23/Q4 — MS: "fake emails sent to person // click on link from fake email // person gives away personal data". ER Jun23: some candidates described <em>prevention</em> instead of defining phishing — read the verb.` },
+
+  { type: "Compare", spec: "1.4", front: `<strong>Shouldering</strong> vs <strong>blagging</strong> — define each.`, back: `<p><strong>Shouldering / shoulder surfing</strong>: watching someone enter a password/PIN (over their shoulder, CCTV, reflections) and using it to access their account.</p><p><strong>Blagging / pretexting</strong>: inventing a fake scenario or false identity (e.g. "I'm from your bank's fraud team") to manipulate someone into revealing information.</p><br><strong>Exam evidence:</strong> Jun23/Q4 — MS for shouldering: "watching a person entering a password… and using it to access an account". Both are forms of social engineering — targets the <strong>human</strong>, not the technology.` },
+
+  { type: "Concept", spec: "1.4", front: `How does a <strong>brute-force attack</strong> work, and how do you defend against it?`, back: `<p><strong>Mechanism:</strong> automated software <strong>systematically tries every possible password</strong> (or a dictionary of common ones) until one works.</p><p><strong>Defences:</strong> strong passwords; <strong>lock account after N failed attempts</strong>; CAPTCHA; <strong>two-factor authentication</strong> (code sent to a separate device).</p><br><strong>Exam evidence:</strong> Jun22/Q5 — MS verbatim: "lock after a set number of failed attempts"; "code is sent to user's separate device… unauthorised person will need access to this device as well". Magic phrase: "harder/impossible for a brute-force attack to succeed".` },
+
+  { type: "Misconception", spec: "1.4", front: `What is a <strong>DoS</strong> attack? How is <strong>DDoS</strong> different?`, back: `<p><strong>DoS:</strong> a <strong>server is flooded with more requests than it can process</strong>, using up all available bandwidth — server crashes or denies access to legitimate users.</p><p><strong>DDoS</strong> = <strong>Distributed</strong> — launched from a <strong>botnet</strong> of thousands of infected "zombie" machines at once, much harder to block by IP.</p><br><strong>Exam evidence:</strong> Jun23/Q4 — MS: "server is flooded with requests… more requests than the server can process… server cannot respond". ER Jun23 trap: target must be a <strong>server / network</strong>, NOT "someone's laptop".` },
+
+  { type: "Concept", spec: "1.4", front: `What is <strong>data interception</strong> (incl. packet sniffing)?`, back: `<p>An attacker captures data as it travels across a network — for example <strong>packet sniffing</strong> unencrypted traffic on open Wi-Fi, or a man-in-the-middle attack.</p><p>The data can then be <strong>read/understood by an unauthorised person</strong>.</p><p>Best defence: <strong>encryption</strong> (HTTPS, WPA2) so intercepted data is meaningless.</p><br><strong>Exam evidence:</strong> Jun23/Q4a tick-grid — only <strong>encryption</strong> protects against data interception. ER Jun23: firewall/pen testing do NOT stop interception once data leaves the LAN.` },
+
+  { type: "Scenario", spec: "1.4", front: `What is <strong>SQL injection</strong>? Give a payload example.`, back: `<p>Attacker types <strong>SQL commands into an input field</strong>; the application concatenates it into a query, so the input becomes <strong>code</strong> instead of <strong>data</strong> — manipulating or extracting from the database.</p><p><strong>Payload:</strong> typing <code>admin' OR '1'='1</code> into a login form makes the WHERE clause always true → returns all users / bypasses login.</p><p><strong>Defence:</strong> parameterised queries + input validation; pen testing finds it before release.</p><br><strong>Exam evidence:</strong> Jun23/Q4a — SQL injection ✓ Penetration testing (Firewall accepted).` },
+
+  { type: "Misconception", spec: "1.4", front: `Define <strong>penetration testing</strong>.`, back: `<p style="background:#ffe; color:#000; padding:8px; border:2px solid #c00;">An <strong style="color:#c00; font-size:1.1em;">AUTHORISED</strong> simulated attack on a computer system to find vulnerabilities/weaknesses before real attackers do.</p><p>The word <strong>authorised</strong> / <strong>with permission</strong> is <strong>MANDATORY</strong> — without it = no mark (otherwise it's hacking under the Computer Misuse Act 1990).</p><p>White-box = tester given internal info. Black-box = tester knows nothing, mimics external attacker.</p><br><strong>Exam evidence:</strong> Jun22/Q5 and spec sub-topic — MS rejects any answer that omits "authorised" / "with permission" / "ethical".` },
+
+  { type: "Definition", spec: "1.4", front: `Describe <strong>anti-malware</strong> software (mark-scheme verbs).`, back: `<p>Software that:</p><ul><li><strong>Scans</strong> files for known malware</li><li><strong>Compares</strong> data to a <strong>database</strong> of known malware</li><li><strong>Alerts the user</strong> and requests action</li><li><strong>Quarantines / deletes</strong> the malware</li><li>Stops the download of malware</li><li>Needs <strong>regular updates</strong> to recognise new threats</li></ul><br><strong>Exam evidence:</strong> Jun22/Q5b (6 marks) — describe two software-based security methods. MS verbatim verbs above. <em>Trap:</em> don't write "removes viruses" — use the four MS verbs.` },
+
+  { type: "Definition", spec: "1.4", front: `Describe how a <strong>firewall</strong> protects a network.`, back: `<p>A firewall:</p><ul><li><strong>Monitors/scans incoming and outgoing traffic</strong></li><li><strong>Compares traffic against a set of rules / criteria</strong></li><li><strong>Blocks</strong> traffic that does not match the allowed criteria / is unauthorised</li><li>Can be hardware or software; sits between the LAN and external network</li></ul><br><strong>Exam evidence:</strong> Jun22/Q5b (6 marks) — MS verbatim. ER Jun22 trap: "blocks bad stuff" with no mention of rules/criteria = no marks. Always say "compares to a set of rules".` },
+
+  { type: "Concept", spec: "1.4", front: `What are <strong>user access levels</strong> and what do they prevent?`, back: `<p>Different users are given <strong>different permissions</strong> (read / write / read-write). Limits the data each user can access and prevents accidental changes.</p><p>Example: teacher vs student vs admin account on a school network.</p><p>Limits damage if one account is compromised; prevents insider misuse.</p><br><strong>Exam evidence:</strong> Jun22/Q5 — MS verbatim: "Different users get different permissions… prevents accidental changes… limits the data each user can access". Pairs well with the 8-mark hospital network question (SAMs/Q8).` },
+
+  { type: "Misconception", spec: "1.4", front: `How does <strong>encryption</strong> protect data? (Watch the trap.)`, back: `<p>Encryption <strong>scrambles</strong> data using an <strong>algorithm / key</strong>, so that <strong>if it is intercepted</strong> by an unauthorised user, it <strong>cannot be understood</strong>. Only those with the correct key can decrypt it.</p><p><strong>TRAP:</strong> encryption does <strong>NOT stop interception</strong> — the data is still intercepted, it just becomes meaningless without the key.</p><br><strong>Exam evidence:</strong> Jun22/Q3e (2 marks) — MS verbatim above. ER Jun22 misconception: candidates wrote "encryption stops interception" → no marks. Pairs with DPA 2018 (Topic 1.6).` },
+
+  { type: "Definition", spec: "1.4", front: `Name <strong>three methods of physical security</strong> for a network.`, back: `<p>Acceptable answers (MS Jun22):</p><ul><li><strong>Locks</strong> on doors / locked server rooms</li><li><strong>Keycard / passcode</strong> door entry</li><li><strong>Biometric entry</strong> (fingerprint / retina)</li><li><strong>CCTV</strong>, alarms, security guards</li></ul><p><strong>TRAP:</strong> do NOT write "password" — that's logical, not physical. But "passcode for a door" IS allowed.</p><br><strong>Exam evidence:</strong> Jun22/Q5a (2 marks) — identify two physical security methods. ER Jun22: candidates lost marks by writing software security instead of physical.` },
+
+  { type: "8-mark", spec: "1.4", front: `8-mark hospital network: name <strong>three threats</strong> + paired <strong>defences</strong> for L3.`, back: `<p><strong>1. Ransomware</strong> → anti-malware (scans/database/quarantines) + regular off-site <strong>backups</strong> so data can be restored without paying.</p><p><strong>2. Phishing / social engineering</strong> → staff training + 2FA + user access levels so a compromised low-level account can't reach all patient data.</p><p><strong>3. Data interception</strong> → <strong>encryption</strong> in transit (HTTPS, WPA2) so sniffed packets are meaningless.</p><p>Add pillars: <strong>firewall</strong> (rules-based filtering); <strong>authorised penetration testing</strong>; physical security (locked server room, CCTV).</p><p><strong>Conclusion:</strong> no single defence is enough — layer technical + physical + human controls; trade-off is cost vs DPA 2018 fine if breached.</p><br><strong>Exam evidence:</strong> SAMs/Q8 (8 marks) — hospital network protection. L3 needs ≥3 threats, paired defences in MS phrasing, applied to context, weighed trade-offs, structured intro/body/conclusion.` },
+// --- flashcards_1_5.js ---
+{ type: "Definition", spec: "1.5.1", front: `What is an <strong>operating system</strong>? (Not "Windows"!)`, back: `<p><strong>Mark scheme:</strong> software that <strong>manages the hardware and software</strong> of a computer, providing a platform on which application software can run.</p><br><strong>Exam evidence:</strong> Jun24/Q3a + Jun25/Q2a context — examiner reports warn: do NOT answer "Windows / macOS / Linux" — give the function, not an example.` },
+
+  { type: "Concept", spec: "1.5.1", front: `Name the <strong>5 functions of an OS</strong> (UMPUF).`, back: `<p><strong>Mark scheme:</strong> <strong>U</strong>ser interface · <strong>M</strong>emory management (multitasking) · <strong>P</strong>eripheral management (drivers) · <strong>U</strong>ser management · <strong>F</strong>ile management.</p><br><strong>Exam evidence:</strong> Jun25/Q2a (5 marks) — tick-table mapped tasks: multitasking → memory mgmt; renaming a folder → file mgmt; creating user accounts → user mgmt; installing a printer driver → peripheral mgmt; transfer of data to/from RAM → memory mgmt.` },
+
+  { type: "Definition", spec: "1.5.1", front: `What does the OS do for <strong>memory management</strong>?`, back: `<p><strong>Mark scheme:</strong> <strong>allocates RAM</strong> to programs/processes; <strong>moves data from secondary storage to RAM</strong> (and back via virtual memory); manages <strong>multitasking</strong> by <strong>time-slicing the CPU</strong>.</p><br><strong>Exam evidence:</strong> Jun24/Q3a — MS accepts "moves data from secondary storage to RAM". Jun25/Q2a — MS phrasing "transfer of data to and from RAM" and "multitasking" both map to memory management.` },
+
+  { type: "Definition", spec: "1.5.1", front: `What is <strong>time-slicing</strong> and why does the OS use it?`, back: `<p><strong>Mark scheme:</strong> each running process is given a <strong>small slice of CPU time</strong> in turn, so multiple programs <strong>appear to run simultaneously</strong> — this is how the OS provides <strong>multitasking</strong>.</p><br><strong>Exam evidence:</strong> Jun25/Q2a (1 mark) — "Multitasking" was the task to be ticked under <strong>memory management</strong>.` },
+
+  { type: "Definition", spec: "1.5.1", front: `What is a <strong>device driver</strong>? (Peripheral management)`, back: `<p><strong>Mark scheme:</strong> software that <strong>translates instructions between the OS and a specific hardware device</strong> so they can communicate. Peripheral management = managing input/output devices using drivers.</p><br><strong>Exam evidence:</strong> Jun25/Q2a (1 mark) — "Installation of a printer driver" → <strong>peripheral management</strong>. Jun24 MS warning: just saying "manages output devices" is NE — must <strong>extend</strong> "manage" (e.g. "by installing drivers", "sending data to them").` },
+
+  { type: "Compare", spec: "1.5.1", front: `<strong>GUI vs CLI</strong> — give one feature of each.`, back: `<p><strong>Mark scheme:</strong> <strong>GUI</strong> = uses <strong>Windows, Icons, Menus, Pointers (WIMP)</strong>, controlled by mouse/touch, easy for beginners, uses more resources. <strong>CLI</strong> = user types <strong>text commands</strong>, no graphics, low resources, faster/more powerful for experienced users, can be scripted.</p><br><strong>Exam evidence:</strong> Jun24/Q3a — "creating/displaying a GUI or command-prompt interface" is MS phrasing for the <strong>user interface</strong> function of the OS.` },
+
+  { type: "Misconception", spec: "1.5.1", front: `Don't write <strong>"folder management"</strong>. What's the spec term?`, back: `<p><strong>File management.</strong> The OCR mark scheme explicitly does NOT award "folder management" — it must be <strong>file management</strong>. This function lets the user create, name, move, copy, delete, open and save files; organises them into directories; manages file access rights.</p><br><strong>Exam evidence:</strong> Jun24/Q3a (1 mark) — MS bullet: "do not award folder management". Jun25/Q2a — "Renaming a folder" → file management.` },
+
+  { type: "Definition", spec: "1.5.1", front: `What is <strong>user management</strong>? (And how is it different from user interface?)`, back: `<p><strong>Mark scheme:</strong> the OS function that <strong>manages user accounts</strong>, sets <strong>access levels / permissions</strong>, and handles <strong>login</strong>. It is NOT the same as the user interface (which is how you see/control the computer).</p><br><strong>Exam evidence:</strong> Jun25/Q2a (1 mark) — "Creation of user accounts" → <strong>user management</strong>.` },
+
+  { type: "Definition", spec: "1.5.2", front: `What is <strong>utility software</strong>? (1-mark "state the purpose")`, back: `<p><strong>Mark scheme:</strong> software that performs <strong>housekeeping tasks</strong> / <strong>maintenance</strong> / <strong>keeps the computer running smoothly</strong> / <strong>identifies and fixes errors</strong> / <strong>improves performance</strong> / <strong>monitors / manages / configures</strong> a computer system.</p><br><strong>Exam evidence:</strong> Jun23/Q5b (1 mark) + Jun25/Q2b(i) (1 mark). <strong>Jun23 ER warning:</strong> do NOT give an example (like "defrag") — must state the <strong>general</strong> purpose.` },
+
+  { type: "Misconception", spec: "1.5.2", front: `"Defrag" — name an example of utility software. Is that the answer to <em>"State the purpose of utility software"</em>?`, back: `<p><strong>NO.</strong> Examiner reports are blunt: do <strong>not</strong> give an example of utility software, and do <strong>not</strong> give a task done by one example. You must state the <strong>general</strong> purpose: "performs housekeeping / maintenance / keeps the computer running smoothly".</p><br><strong>Exam evidence:</strong> Jun23/Q5b ER + Jun25/Q2b(i) MS — "Do not accept a specific example of utility software. Do not accept a task performed by one example."` },
+
+  { type: "Definition", spec: "1.5.2", front: `Explain the <strong>purpose and function of encryption software</strong>. (3 marks)`, back: `<p><strong>Mark scheme (3 points):</strong> (1) <strong>scrambles / jumbles / encodes / cyphers</strong> data; (2) using an <strong>algorithm and a key</strong> (encrypt / decrypt); (3) so that if <strong>intercepted</strong> it is <strong>meaningless / cannot be understood / cannot be used</strong> without the correct key.</p><br><strong>Exam evidence:</strong> Jun25/Q2b(ii) (3 marks). Also Jun24/Q3b gap-fill words: <em>encryption · key · understood</em>. <strong>Trap:</strong> encryption does NOT prevent interception — only stops the data being understood. Don't write "lock" — write <strong>"key"</strong>.` },
+
+  { type: "Scenario", spec: "1.5.2", front: `<strong>Defragmentation</strong> — explain how it speeds up a slow computer. (Restaurant HDD scenario)`, back: `<p><strong>Mark scheme:</strong> files on the HDD that have been <strong>split and stored in separate locations</strong> are <strong>moved</strong> so they are stored <strong>consecutively / contiguously</strong>; <strong>empty/free spaces are collected together</strong>; the <strong>read/write head does not have to move as far</strong> → <strong>fewer disc accesses</strong> / <strong>faster access</strong>.</p><br><strong>Exam evidence:</strong> SAMs/Q9b (3 marks) — MS: "files moved" · "empty spaces collected together" · "files stored together" · "fewer disc accesses". SAMs/Q9a (4 marks) explained how fragmentation occurred (orders saved → deleted → new bigger files split into the gaps).` },
+
+  { type: "Misconception", spec: "1.5.2", front: `Should you <strong>defragment an SSD</strong>?`, back: `<p><strong>NO.</strong> Defrag is for <strong>magnetic HDDs only</strong>. SSDs have <strong>no moving read/write head</strong> — every cell is accessed at the <strong>same speed</strong>, so there is no speed benefit. Worse: SSDs have a <strong>limited number of write cycles</strong>, so defragging <strong>shortens SSD lifespan</strong>. (Cross-link 1.2.2.)</p><br><strong>Exam evidence:</strong> Jun24 MS — defrag "does NOT delete files" and "does NOT create more storage space"; it only <strong>moves/rearranges</strong> files. Classic J277/01 trap.` },
+
+  { type: "Definition", spec: "1.5.2", front: `What does <strong>data compression</strong> software do?`, back: `<p><strong>Mark scheme:</strong> <strong>reduces the file size</strong> of a file — uses less storage and allows faster transmission / lower bandwidth. <strong>Lossy</strong> = some data permanently removed; smaller file but irreversible. <strong>Lossless</strong> = no data lost; smaller file size savings but fully reversible. (Cross-link 1.2.5.)</p><br><strong>Exam evidence:</strong> Likely 2026 stem: "State one utility software and its purpose." (2 marks) — MS accepts compression + "reduces the file size of a file".` },
+
+  { type: "Compare", spec: "1.5.2", front: `<strong>Full vs incremental backup</strong> — what's copied each time?`, back: `<p><strong>Mark scheme:</strong> <strong>Full backup</strong> = copies <strong>everything</strong> (every file) every time → slow backup, big storage, fast restore. <strong>Incremental backup</strong> = copies <strong>only the files that have changed since the last backup</strong> → fast backup, small storage, slow restore (need the full + every incremental, in order).</p><br><strong>Exam evidence:</strong> Likely 2026 stem: "Describe the difference between a full and an incremental backup." (2 marks) — MS keys: "all files copied" vs "only files changed since last backup".` },
+
+  { type: "Concept", spec: "cross", front: `Two utilities that also appear in <strong>1.4 (network security)</strong> — name them and their security role.`, back: `<p><strong>Mark scheme:</strong> (1) <strong>Encryption</strong> — scrambles data with a key so intercepted data is meaningless; protects data in transit and at rest. (2) <strong>Anti-malware / antivirus</strong> — scans for and removes viruses/worms/trojans; quarantines infected files; updates virus definitions. Both are <strong>utility software</strong> AND <strong>network security</strong> measures.</p><br><strong>Exam evidence:</strong> Jun24/Q3b gap-fill confirms encryption as utility software. Cross-link 1.4 — anti-malware is a standard prevention method on the network-threats list.` },
+// --- flashcards_1_6.js ---
+{
+    type: "Definition",
+    spec: "1.6",
+    front: `Name the <strong>FIVE impact categories</strong> for 1.6 and give a one-line definition of each.`,
+    back: `<p><strong>E-L-C-E-P</strong>:</p><p><strong>Ethical</strong> – what is morally right/wrong, regardless of law.</p><p><strong>Legal</strong> – what the law (DPA, CMA, CDPA) requires.</p><p><strong>Cultural</strong> – effect on groups, communities, language, behaviour.</p><p><strong>Environmental</strong> – impact on the planet (energy, materials, e-waste).</p><p><strong>Privacy</strong> – an individual's control over their personal data.</p><br><p><strong>Exam evidence:</strong> Every 1.6 8-marker (SAMs/Q11, Jun22/Q4, Jun23/Q6, Jun24/Q4, Jun25/Q3) names 2–3 of these categories as bullets you MUST cover.</p>`
+  },
+  {
+    type: "8-mark",
+    spec: "1.6",
+    front: `<strong>8-mark Q scaffold</strong> — what structure earns Mark Band 3 (7–8)?`,
+    back: `<p><strong>PEEL × 4</strong> – one paragraph per lens named in the question (Privacy / Ethical / Environmental / Legal / Cultural).</p><p><strong>1.</strong> One-line definition of the technology.</p><p><strong>2.</strong> Positive paragraph(s) – label the category, link to scenario.</p><p><strong>3.</strong> Negative paragraph(s) – label the category, link to scenario.</p><p><strong>4.</strong> Name a piece of legislation <em>in context</em> (DPA / CMA / CDPA).</p><p><strong>5.</strong> Conclusion with a <strong>justified judgement/recommendation</strong>.</p><br><p><strong>Exam evidence:</strong> Jun24/Q4 (8 marks) ER: <em>"Fewer candidates included a recommendation… the question asked for a recommendation."</em> Band 3 requires balanced positive AND negative discussion explicitly applied to the scenario.</p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.6",
+    front: `List the <strong>THREE offences</strong> under the <strong>Computer Misuse Act 1990</strong>.`,
+    back: `<p><strong>1.</strong> Unauthorised <strong>access</strong> to computer material.</p><p><strong>2.</strong> Unauthorised access <strong>with intent</strong> to commit a further offence.</p><p><strong>3.</strong> Unauthorised <strong>modification</strong> of computer material.</p><p><em>You MUST list all three for full marks – students drop a mark by listing only two.</em></p><br><p><strong>Exam evidence:</strong> Jun22/Q5c &amp; SAMs/Q10d tick-grids place "guessing a teacher's password" / "installing a keylogger" / "leaving a message on a logged-on computer" under CMA. MS awards 1 mark per offence (max 3).</p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.6",
+    front: `What is the <strong>Data Protection Act 2018</strong>? What does it do?`,
+    back: `<p>The DPA 2018 <strong>controls how personal data is used by organisations, businesses and the government</strong>. UK implementation of GDPR. Anyone storing personal data must register as a <strong>data controller</strong> with the ICO.</p><p>It gives individuals rights: <strong>access</strong> their data, <strong>rectification</strong>, <strong>erasure</strong> ("right to be forgotten"), and to be <strong>notified of breaches</strong>.</p><br><p><strong>Exam evidence:</strong> Jun25/Q4f (4 marks) — MS: <em>"Data Protection Act (2018) / DPA / GDPR"</em> (1 mark) + 3 marks for steps to comply.</p>`
+  },
+  {
+    type: "Concept",
+    spec: "1.6",
+    front: `Give the <strong>six DPA 2018 principles</strong> paraphrased.`,
+    back: `<p>Personal data must be:</p><p><strong>1.</strong> Lawful, fair and transparent.</p><p><strong>2.</strong> Collected for a <strong>specific purpose</strong> – not reused for unrelated reasons.</p><p><strong>3.</strong> <strong>Minimal / adequate</strong> – only what is needed.</p><p><strong>4.</strong> <strong>Accurate</strong> and up-to-date.</p><p><strong>5.</strong> <strong>Not kept longer than needed</strong>.</p><p><strong>6.</strong> Kept <strong>secure</strong> (encryption, firewalls, access levels).</p><br><p><strong>Exam evidence:</strong> Jun25/Q4f (4 marks) — MS-accepted steps include: encrypt, firewall, access rights, do not share/sell without consent, only keep relevant data, do not store longer than needed, keep accurate, only use for purpose collected, notify breaches, train staff.</p>`
+  },
+  {
+    type: "Definition",
+    spec: "1.6",
+    front: `What does the <strong>Copyright, Designs and Patents Act 1988</strong> (CDPA) protect, and give 2 example breaches.`,
+    back: `<p>The CDPA 1988 protects <strong>the creator's rights to their original works</strong>. It makes it illegal to <strong>copy, modify, distribute or perform</strong> a protected work without permission. Protects software, music, films, books, images, designs.</p><p>Example breaches:</p><p>• <strong>Downloading films/music from a torrent site</strong> without paying.</p><p>• <strong>Using a copyrighted picture as a company logo</strong> without the creator's permission.</p><p>• Reselling software bought under a single licence.</p><br><p><strong>Exam evidence:</strong> SAMs/Q10d tick-grid — "Using a picture for a new logo without the original creator's permission" → CDPA; "Making a copy of the latest Hollywood blockbuster and sharing it" → CDPA.</p>`
+  },
+  {
+    type: "Compare",
+    spec: "1.6",
+    front: `<strong>Open source vs proprietary</strong> software – give 2 features of each (MS phrasing).`,
+    back: `<p><strong>Open source:</strong> <em>"(usually free), can access/change source code, redistribute"</em>; wider customer base; users can fix bugs; limited documentation; little financial gain for creator.</p><p><strong>Proprietary:</strong> <em>"purchase at a cost, cannot access/change code"</em>; allows programmer to earn money; more control over IP; usually well-tested; cannot be adapted to user needs.</p><p><strong>Both</strong> are <strong>copyrighted</strong> – the creator still owns the IP.</p><br><p><strong>Exam evidence:</strong> Jun24/Q4 (8 marks) MS indicative content — these exact phrases. Jun23/Q5d (4+2 marks): proprietary benefit to creator = "earn money via licences, no-one can see code"; open source benefit to user = "view/edit code to tailor/improve/adapt, errors fixed by anyone, freely accessible".</p>`
+  },
+  {
+    type: "8-mark",
+    spec: "1.6",
+    front: `<strong>Worked Band-3 answer</strong>: Jun22/Q4 — "Social networking websites use AI to monitor user posts. Discuss positive and negative uses including legal, ethical, privacy issues." [8]`,
+    back: `<p><strong>Define:</strong> AI scans every user post against rules/training data to flag inappropriate or illegal content automatically.</p><p><strong>[Legal +]</strong> Under <strong>CDPA 1988</strong>, AI can auto-detect plagiarised videos/images. Under <strong>DPA 2018</strong>, rules must be followed so the algorithm does not breach security. Users agreed to T&amp;Cs on signup so should expect it.</p><p><strong>[Ethical +]</strong> Can limit plagiarism; ensures inappropriate/illegal posts are not published; users feel safer because they know harmful content is filtered.</p><p><strong>[Ethical −]</strong> Users may not want everything they post monitored; AI may <strong>incorrectly block</strong> users/posts (bias); records of monitoring may be stored and reused for other means.</p><p><strong>[Privacy −]</strong> Users may feel watched all the time; T&amp;Cs may sign away their rights to privacy; <em>however</em>, some may prefer a computer analysing their posts than people reading them.</p><p><strong>Conclusion:</strong> On balance, AI monitoring is justified <strong>provided</strong> the platform is transparent (DPA-compliant), users consent, and human appeal is allowed for incorrect blocks.</p><br><p><strong>Exam evidence:</strong> Jun22/Q4 (8 marks) — every bullet above is taken directly from the MS indicative content. ER 2022 warned: <em>"primarily negative, positive points limited"</em> — force at least 2 positives.</p>`
+  },
+  {
+    type: "8-mark",
+    spec: "1.6",
+    front: `<strong>Worked Band-3 answer</strong>: SAMs/Q11 — "Discuss the impact of people wanting to upgrade smartphones, including users, cultural, ethical, environmental." [8]`,
+    back: `<p><strong>Define:</strong> Users replace working smartphones with the latest model every 1–2 years for newer features or status.</p><p><strong>[Cultural −]</strong> Desire/need to own the newest device to <strong>fit in with peers</strong>; new features may be required for work/leisure.</p><p><strong>[Environmental −]</strong> <strong>E-waste</strong> – people dispose of working devices in landfill; modern phones <strong>poorly designed for durability</strong>; hardware <strong>not upgradeable/replaceable</strong>; equipment sent abroad (Africa/Asia) for disposal; <strong>toxic waste released into land, ground water, air</strong>; waste of precious metals.</p><p><strong>[Environmental +]</strong> Older devices could be <strong>distributed to people without devices</strong> or <strong>recycled for components</strong>.</p><p><strong>[Ethical −]</strong> Contributes to <strong>digital divide</strong> and social divide; <strong>social pressure on parents</strong> to pay for upgrades; bullying of those who can't afford the latest tech; <strong>manufacturers intentionally design fragile phones</strong> (planned obsolescence); confidential data left on discarded devices.</p><p><strong>Conclusion:</strong> The drive to upgrade is largely harmful – environmentally and ethically – unless tempered by recycling schemes and longer-lasting design.</p><br><p><strong>Exam evidence:</strong> SAMs/Q11 (8 marks) — every bullet from MS indicative content. Band 3 requires balanced AND scenario-applied.</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.6",
+    front: `<strong>Jun23/Q6 stem</strong>: Facial recognition added to shopping-centre CCTV. Name <strong>one privacy positive</strong> and <strong>one privacy negative</strong> (MS phrasing).`,
+    back: `<p><strong>Privacy +:</strong> Customers are already in a <strong>public place</strong> and can be legally recorded by anyone anyway.</p><p><strong>Privacy −:</strong> Users may feel it is an <strong>invasion of privacy</strong>; customers have <strong>not given permission</strong> to be tracked through the centre and may not know the system exists.</p><p><strong>DPA link:</strong> facial data is <em>personal data</em> – the centre must keep it secure, only use for the stated purpose, inform customers via signs, and can be <strong>fined</strong> for breaches.</p><br><p><strong>Exam evidence:</strong> Jun23/Q6 (8 marks) MS. ER 2023: candidates lost marks by discussing CCTV generally rather than the <em>upgrade</em> to facial recognition – stick to the new element.</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.6",
+    front: `<strong>Jun25/Q3 stem</strong>: Tablet maker cuts manufacturing cost and stops releasing software updates for older tablets. Give 2 <strong>environmental</strong> and 2 <strong>ethical</strong> impacts (MS phrasing).`,
+    back: `<p><strong>Environmental −:</strong> Increase in <strong>e-waste</strong> from products that are disposed of.</p><p><strong>Environmental +:</strong> Older devices could be <strong>distributed to people without devices</strong>, or products <strong>recycled for components</strong>.</p><p><strong>Ethical:</strong> Will cost remain the same? – <strong>unfair on customers</strong>; will customers be told or are they being <strong>deceived</strong>? Ethical for the company (more profit, better staff pay) but <strong>unethical to customers</strong>. Reduced cost may = reduced reputation, long-term loss if customers leave. Lower price may let more people afford a device.</p><p><strong>Recommendation hook:</strong> Cost-cutting is acceptable <strong>only if</strong> customers are informed and devices remain reliable.</p><br><p><strong>Exam evidence:</strong> Jun25/Q3 (8 marks) MS indicative content. Top band requires both positive AND negative for both customer and company.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "1.6",
+    front: `<strong>DPA vs CMA</strong> – which law applies?<br>(a) Hacker breaks into a bank to steal data.<br>(b) A company stores customer data insecurely.<br>(c) Secretary reads lawyer's personal email without permission.`,
+    back: `<p>(a) <strong>CMA 1990</strong> – unauthorised access with intent to commit a further offence (offence 2). DPA does NOT cover the act of hacking.</p><p>(b) <strong>DPA 2018</strong> – principle 6 (secure). DPA governs how organisations <strong>store/process</strong> personal data.</p><p>(c) <strong>CMA 1990</strong> – unauthorised access to computer material (offence 1). The DPA governs the <strong>company's</strong> data handling; CMA governs the <strong>act of breaking in</strong>.</p><br><p><strong>Exam evidence:</strong> SAMs/Q10d &amp; Jun22/Q5c tick-grids (6 &amp; 5 marks). MS: "Storing customer data insecurely" = DPA; "Installing a keylogger on a colleague's computer" = CMA; "Secretary accessing lawyer's email" = CMA.</p>`
+  },
+  {
+    type: "Concept",
+    spec: "1.6",
+    front: `<strong>Digital divide</strong> – what is it, and give 2 named causes (cultural angle).`,
+    back: `<p>The <strong>digital divide</strong> is the gap between those who have <strong>access to modern digital technology</strong> (devices, fast broadband, skills) and those who do not.</p><p>Causes:</p><p>• <strong>Cost</strong> – poorer families cannot afford a device per child or fast broadband.</p><p>• <strong>Geography</strong> – rural areas lack reliable broadband infrastructure.</p><p>• Age – elderly users excluded from online-only services.</p><p>• Phone upgrade culture creates bullying / FOMO for those without latest tech.</p><br><p><strong>Exam evidence:</strong> SAMs/Q11 MS — <em>"Contributes to the digital divide… social divide… bullying of those who cannot afford the latest technology."</em></p>`
+  },
+  {
+    type: "Concept",
+    spec: "1.6",
+    front: `What is <strong>planned obsolescence</strong>? Give 2 examples (environmental/ethical angle).`,
+    back: `<p><strong>Planned obsolescence</strong> = manufacturers deliberately design products so they need replacing sooner, to boost sales.</p><p>Examples:</p><p>• Phones with <strong>non-replaceable batteries</strong> or <strong>fragile</strong> screens.</p><p>• Hardware that is <strong>not upgradeable/replaceable</strong>.</p><p>• <strong>Stopping software updates</strong> for older devices so they become insecure or unsupported (Jun25/Q3 scenario).</p><p>Consequences: more <strong>e-waste in landfill</strong>, toxic waste released into land/water/air, social pressure to upgrade.</p><br><p><strong>Exam evidence:</strong> SAMs/Q11 MS: <em>"Phone manufacturers intentionally designing fragile phones so they need to be replaced more often."</em> Jun25/Q3 stem: stopping updates so customers must buy new devices.</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.6",
+    front: `A youth centre stores members' names, addresses and medical info. Name <strong>the legislation</strong> and give <strong>3 steps</strong> the centre must take. (4 marks)`,
+    back: `<p><strong>Legislation:</strong> <strong>Data Protection Act 2018</strong> (DPA / GDPR).</p><p>Any 3 steps from:</p><p>• <strong>Keep data secure</strong> – encrypt, firewalls, access rights, physical security.</p><p>• Do not <strong>share/sell</strong> data without consent.</p><p>• Only keep <strong>relevant</strong> data; do not collect what is not required.</p><p>• Do not store <strong>longer than needed</strong>; delete when finished.</p><p>• Keep data <strong>accurate/up-to-date</strong>.</p><p>• Only use data for the <strong>purpose collected</strong>.</p><p>• Appoint a <strong>Data Protection Officer</strong>.</p><p>• <strong>Notify individuals</strong> of breaches; train staff in the principles.</p><br><p><strong>Exam evidence:</strong> Jun25/Q4f (4 marks) — MS: 1 mark for naming DPA + 1 mark each (max 3) for steps. ER 2025: candidates lost marks giving generic "keep it safe" rather than concrete actions.</p>`
+  },
+// --- flashcards_cross_A.js ---
+{
+    type: "Connection",
+    spec: "1.1 + 1.5",
+    front: `How does the <strong>operating system</strong> <em>multi-task</em>, and what is the <strong>CPU</strong> actually doing while that happens?`,
+    back: `<p>The OS performs <strong>memory management</strong> and <strong>processor (CPU) scheduling</strong>: it gives each running process a tiny <strong>slice of CPU time</strong> so processes <strong>appear to run simultaneously</strong>.</p><p>Underneath, the CPU is running its <strong>Fetch–Decode–Execute cycle</strong> through one process's instructions. After a few thousand cycles, a scheduler <strong>interrupt</strong> swaps the process out: registers are saved, the next process's registers are loaded, and the FDE cycle continues on the new instructions. Repeat thousands of times per second.</p><br><p><strong>Exam evidence:</strong> Jun25/Q2a (1 of 5 marks) — "running multiple programs at the same time" → MS: <em>memory management / processor (CPU) management / multi-tasking</em>. Combine with Jun24/Q6a (FDE: fetched → decoded → executed).</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.1 + 1.2",
+    front: `A car's <strong>'Follow Me'</strong> embedded cruise-control system has <strong>ROM</strong> and <strong>RAM</strong> but <strong>no virtual memory</strong>. <em>Why?</em>`,
+    back: `<p>An <strong>embedded system</strong> is a computer built into a larger device to perform a <strong>single dedicated task</strong>. It runs a <strong>small fixed program</strong> with <strong>limited inputs</strong> — so the amount of RAM needed is <strong>small and predictable</strong>.</p><p>The system <strong>does not run multiple applications</strong>, so the RAM will <strong>never become full</strong>. There is therefore <strong>no need for virtual memory</strong> (which would swap data from secondary storage when RAM is full).</p><br><p><strong>Exam evidence:</strong> Jun24/Q7a + Q7b(iii) (3 + 2 marks) — MS for (iii): <em>"the 'Follow Me' system performs limited / few tasks // it does not need to run multiple applications // RAM will not become full / there is enough RAM."</em></p>`
+  },
+  {
+    type: "Trace",
+    spec: "1.2 + 1.5",
+    front: `<strong>Virtual memory</strong>: trace the path of a piece of data from when it overflows RAM to when it's needed again. Which OS function manages this?`,
+    back: `<p>Managed by the OS's <strong>memory management</strong> function.</p><p>1. <strong>RAM becomes full</strong>.<br>2. Data not currently being used is <strong>moved out of RAM</strong> and stored in a section of <strong>secondary storage</strong> called <strong>virtual memory</strong>.<br>3. When that data is needed again, it is <strong>transferred back to RAM</strong>.<br>4. To make space, other unused data is moved from RAM → virtual memory.</p><p><strong>Trap:</strong> the final step is <em>back to RAM</em>, NOT "back to primary storage" (Jun23 ER flagged this as too vague).</p><br><p><strong>Exam evidence:</strong> Jun23/Q5a(iii) (4 marks, true/false on VM); Jun24/Q3a (4 marks) — MS: <em>"Memory management — transfers data between RAM and secondary storage / manages virtual memory."</em></p>`
+  },
+  {
+    type: "Connection",
+    spec: "1.3 + 1.5",
+    front: `Which <strong>OS function</strong> handles a printer's NIC driver, and how does the printer end up connected to the network?`,
+    back: `<p><strong>Peripheral management / device drivers</strong> is the OS function. The OS installs and runs a <strong>device driver</strong> — software that lets the OS communicate with the printer (or NIC, or graphics card).</p><p>On the <strong>network side</strong>, the printer connects (wired or Wi-Fi) to a <strong>switch</strong> which routes data using <strong>MAC addresses</strong>. The OS sends print jobs through the driver, down the network stack, and out via the NIC.</p><br><p><strong>Exam evidence:</strong> Jun25/Q2a (5 marks) — MS row: <em>"Installing the driver for a new printer" → Peripheral management / Device driver management.</em> Pair with Jun24/Q2c(iii) on switch role.</p>`
+  },
+  {
+    type: "Compare",
+    spec: "1.1 + 1.2",
+    front: `<strong>Why is cache faster than RAM?</strong> Where does the FDE cycle look <em>first</em> for the next instruction?`,
+    back: `<p><strong>Cache</strong> is <strong>very fast memory built into / very close to the CPU</strong>. RAM sits further away on the motherboard, so accessing RAM takes longer.</p><p>During the FDE cycle, the CPU checks <strong>cache first</strong>. If the instruction or data is in cache (a <em>cache hit</em>) it is fetched immediately. Only on a <em>cache miss</em> does the CPU fetch from RAM. <strong>Larger cache</strong> = more instructions stored close to the CPU = <strong>fewer trips to RAM</strong> = higher performance.</p><br><p><strong>Exam evidence:</strong> SAMs/Q1c (2 marks) — MS: <em>"Cache stores frequently used data/instructions (1); so the CPU does not need to fetch it from RAM each time / quicker to access (1)."</em></p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.4 + 1.6",
+    front: `A hacker <strong>brute-forces a Wi-Fi password</strong> to access a neighbour's network and copy their files. <em>Which CMA 1990 offences apply?</em>`,
+    back: `<p>The <strong>Computer Misuse Act 1990</strong> has <strong>three offences</strong>:</p><p>1. <strong>Unauthorised access</strong> to computer material — guessing the Wi-Fi password itself.<br>2. <strong>Unauthorised access with intent to commit a further offence</strong> — accessing in order to copy private files.<br>3. <strong>Unauthorised modification</strong> of computer material — if they then deleted or altered any files.</p><p><strong>Brute force</strong> is a 1.4 network attack: trying every possible password combination, often automated, until the correct one is found. Strong/long passwords and account lockouts defend against it.</p><br><p><strong>Exam evidence:</strong> SAMs/Q10d (6 marks, legislation tick-table) — every "unauthorised access" / "without permission" row maps to CMA 1990. Jun23/Q4 lists brute-force as a threat.</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.3 + 1.2 + 1.6",
+    front: `A law firm moves its files to the <strong>cloud</strong>. What <em>type of network</em> is the cloud, what <em>kind of storage</em> is it, and what <em>legislation</em> still applies to the data?`,
+    back: `<p><strong>Network (1.3.1):</strong> the cloud is storage on <strong>remote servers accessed over the internet</strong> — i.e. over a <strong>WAN</strong>. Needs a constant internet connection; reliant on a third party.</p><p><strong>Storage (1.2.2):</strong> the data physically lives on the cloud provider's <strong>secondary storage</strong> (usually large magnetic HDDs or SSDs in a data centre) — not on the law firm's local machines.</p><p><strong>Legislation (1.6):</strong> the firm is <strong>still legally responsible</strong> under the <strong>Data Protection Act 2018</strong> for any personal data, even though a third party stores it.</p><br><p><strong>Exam evidence:</strong> SAMs/Q10b+c (4+4 marks) — MS disadvantages: <em>"still legally responsible if things go wrong (1) // Implications of Data Protection Act (1) // Reliant on third party (1)."</em> Jun25/Q4d and Q4f reinforce.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "1.4 + 1.5",
+    front: `<em>"Encryption stops hackers intercepting my data on the network."</em> — what's <strong>wrong</strong>, and which <strong>utility software</strong> actually does this job?`,
+    back: `<p><strong>Wrong:</strong> encryption does <strong>not</strong> stop data being intercepted. Data can still be intercepted while travelling across the network.</p><p><strong>Correct (mark-scheme phrasing):</strong> <strong>encryption software</strong> (a 1.5.2 utility) <strong>scrambles data using a key</strong> so that if it <em>is</em> intercepted it is <strong>meaningless / cannot be understood</strong> without the key. The recipient uses a key to <strong>decrypt</strong> back to plaintext.</p><p>This sits across <strong>1.4 (prevents data being read after an interception attack)</strong> and <strong>1.5.2 (encryption utility software)</strong>.</p><br><p><strong>Exam evidence:</strong> Jun25/Q2b(ii) (3 marks) — MS: <em>"scrambles the data (1) using a key (1) so it is meaningless if intercepted (1)."</em> Jun22 ER flags "stops interception" as wrong.</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.2 + 1.3",
+    front: `When TikTok sends a video to your phone, <strong>where does compression happen</strong> and <strong>where does TCP/IP fit in</strong>?`,
+    back: `<p><strong>Compression (1.2.5)</strong> happens at the <strong>sending end</strong>: the raw video is reduced in file size (usually <strong>lossy</strong> for video — some quality removed permanently) so it takes <strong>less bandwidth</strong> and <strong>downloads faster</strong>.</p><p><strong>TCP/IP (1.3.2)</strong> then takes over: the compressed file is split into <strong>packets</strong>, each given an <strong>IP address</strong> (destination), routed across the internet, and reassembled at your phone. <strong>Layered protocols</strong> mean compression, transport, and physical transmission are handled independently.</p><br><p><strong>Exam evidence:</strong> Likely 2026 stem: <em>"Explain two benefits of compressing a video file before streaming it." (4 marks)</em> — representative. MS-style: <em>smaller file size / less bandwidth used / faster to send / cheaper data usage.</em> Based on Jun22/Q6d(i).</p>`
+  },
+  {
+    type: "Scenario",
+    spec: "1.1 + 1.2 + 1.5",
+    front: `A <strong>Sky-Q-style set-top box</strong> records TV. Identify: <em>(a) the embedded system feature, (b) why it uses a magnetic HDD, (c) one utility it would run.</em>`,
+    back: `<p><strong>(a) Embedded (1.1.3):</strong> the set-top box is a <strong>computer built into a larger device</strong> to perform a <strong>dedicated function</strong> (record/play TV). It boots from <strong>ROM</strong> with fixed firmware.</p><p><strong>(b) Magnetic HDD (1.2.2):</strong> chosen for <strong>high capacity per £</strong> — needed because video files are huge. The box is stationary so the fragility of a magnetic drive doesn't matter.</p><p><strong>(c) Utility (1.5.2):</strong> a <strong>defragmentation utility</strong> rearranges fragmented recordings into <strong>contiguous blocks</strong>, reducing read-head movement and giving <strong>faster playback / fewer disc accesses</strong>. Defrag is HDD-only — not used on SSDs.</p><br><p><strong>Exam evidence:</strong> SAMs/Q9a+b (4+3 marks, defrag); Jun24/Q5b(i) (magnetic vs SSD justification); Jun24/Q7a (embedded). Representative composite stem for 2026.</p>`
+  },
+  {
+    type: "Compare",
+    spec: "1.3 + 1.4",
+    front: `A hospital network is hit by both a <strong>DoS attack</strong> and an <strong>SQL injection</strong>. For each, name (a) what part of the network is targeted and (b) one prevention method.`,
+    back: `<p><strong>DoS / DDoS (1.4):</strong> floods a <strong>server / web server</strong> with so many requests it <strong>cannot respond to legitimate users</strong>. Prevention: <strong>firewall</strong> filters/blocks unauthorised traffic; rate-limiting at the router.</p><p><strong>SQL injection (1.4):</strong> targets the <strong>database server</strong> behind a website — malicious SQL is typed into an input box to read/alter data. Prevention: <strong>input validation</strong> / sanitising form inputs / parameterised queries.</p><p>Both rely on 1.3 infrastructure (servers, packets, ports) — and both are CMA 1990 §1 offences (unauthorised access) under 1.6.</p><br><p><strong>Exam evidence:</strong> SAMs/Q8a (6 marks, three ways hospital protects network); Jun23/Q4a (4-mark tick-table matching prevention methods to threats). MS for firewall: <em>"scans incoming/outgoing traffic; blocks unauthorised traffic."</em></p>`
+  },
+  {
+    type: "Connection",
+    spec: "1.1 + 1.3",
+    front: `<strong>More CPU cores</strong> won't help a slow Wi-Fi connection. <em>Why not?</em> What actually limits network performance?`,
+    back: `<p><strong>CPU performance (1.1.2)</strong> depends on <strong>clock speed</strong>, <strong>number of cores</strong>, and <strong>cache size</strong> — these speed up <em>local</em> processing.</p><p><strong>Network performance (1.3.1)</strong> is limited by:<br>• <strong>Bandwidth</strong> available to share<br>• <strong>Number of users/devices</strong> contending for that bandwidth<br>• Wired vs wireless (interference, range)<br>• <strong>Type of transmission media</strong> (copper, fibre)</p><p>Adding cores doesn't make the Wi-Fi link wider. The bottleneck is the <strong>shared bandwidth</strong>, not the CPU.</p><br><p><strong>Exam evidence:</strong> Jun22/Q3a(i) (3 marks) — MS: <em>"bandwidth has to be split between devices (1); collisions/contention increase (1); less bandwidth per device → slower transmission (1)."</em> Pair with Jun24/Q6c (CPU performance characteristics).</p>`
+  },
+// --- flashcards_cross_B.js ---
+{
+    type: "8-mark",
+    spec: "cross",
+    front: `<strong>How do I spot the 8-mark Q?</strong><br>What clues in the stem tell me it's the starred extended-response?`,
+    back: `<strong>Command words:</strong> "<em>discuss</em>", "<em>evaluate</em>", "<em>analyse the impact of</em>", "make a recommendation".<br>
+<strong>Stem length:</strong> 4-8 lines, always a real-world scenario.<br>
+<strong>Topic:</strong> 100% of past 8-markers are <strong>1.6 (Ethical / Legal / Cultural / Environmental / Privacy)</strong> — often touching 1.4 (security) or 1.3 (networks).<br>
+<strong>Bullets:</strong> the stem lists 2-3 named "issues to consider" (e.g. "ethical, environmental"). Hit every named bullet.<br>
+<strong>Plan:</strong> 60s on a PEEL x 4 (Privacy / Ethical / Environmental / Legal) two-column positives-vs-negatives grid before writing.<br>
+<strong>Exam evidence:</strong> SAMs/Q11 (smartphone upgrades), Jun22/Q4 (AI on social media), Jun23/Q6 (facial recognition CCTV), Jun24/Q4 (open source vs proprietary), Jun25/Q3 (tablet obsolescence). All 8 marks, all 1.6, all starred.`
+  },
+  {
+    type: "8-mark",
+    spec: "cross",
+    front: `<strong>Jun24/Q4 (8 marks) — worked answer</strong><br>"A programmer needs to decide whether to release their game as <strong>open source</strong> or <strong>proprietary</strong>. Discuss the features, benefits and drawbacks of each licence and <strong>make a recommendation</strong>. Include: features of each licence; legal and ethical issues; benefits and drawbacks." [8]`,
+    back: `<strong>Band-3 (7-8) model:</strong><br>
+<em>Features.</em> Open source releases the <strong>source code</strong> so users can read, modify and redistribute it (e.g. Linux, GIMP). Proprietary keeps source code <strong>secret</strong> and users only get the compiled executable, usually after paying a licence (e.g. Windows, AAA games).<br>
+<em>Benefits — open source.</em> Free or low cost, wider customer base, more exposure, users can fix bugs / tailor the game to their needs ("many eyes" testing). Easier to build a modding community.<br>
+<em>Benefits — proprietary.</em> Programmer can earn money by selling licences; more control over the IP; usually better-tested with professional QA; official customer support / patches on a schedule.<br>
+<em>Drawbacks — open source.</em> Little financial gain for the programmer; limited documentation; rivals can resell or claim it as their own. <em>Drawbacks — proprietary.</em> Costs the user money; users can't fix bugs or adapt; vendor lock-in.<br>
+<em>Legal/ethical.</em> <strong>Both</strong> are covered by copyright under <strong>CDPA 1988</strong> — open source just licenses others to copy. Releasing closed-source then copying GPL code would breach CDPA. Selling without disclosing telemetry could breach <strong>DPA 2018</strong>.<br>
+<em>Recommendation.</em> "I would recommend <strong>proprietary</strong> because the programmer's main goal is to <strong>earn money from the game</strong>; proprietary gives revenue + control. If they instead value community modding and exposure, open source would suit them better." A clear recommendation is required for top band.<br>
+<strong>Exam evidence:</strong> Jun24/Q4 (8 marks). Jun24 ER: "Fewer candidates included a recommendation… the question asked for a recommendation."`
+  },
+  {
+    type: "8-mark",
+    spec: "cross",
+    front: `<strong>Jun23/Q6 (8 marks) — worked answer</strong><br>"A shopping centre's CCTV is being upgraded to include <strong>facial recognition</strong> to identify, track and record individuals. Discuss the positive and negative impacts including: ethical, privacy, legal issues." [8]`,
+    back: `<strong>Band-3 model.</strong><br>
+<em>Define.</em> Facial recognition uses AI to match faces from CCTV against a database to identify and track individuals around the centre.<br>
+<em>Legal +.</em> Helps identify people committing crimes (theft, assault), provides evidence to prosecute the correct person. The centre is <strong>private property</strong> so customers can choose not to enter — implied consent.<br>
+<em>Ethical +.</em> Users feel safer because actions are monitored and help will be taken if needed. If users have done nothing wrong, there is no reason to be tracked, so it should not impact them.<br>
+<em>Privacy +.</em> Shoppers are already in a public place where anyone can legally record them, so the marginal privacy loss is small.<br>
+<em>Privacy -.</em> Many users feel it is an <strong>invasion of privacy</strong> to be watched and tracked constantly. Customers may not know the system exists and have not given explicit permission.<br>
+<em>Ethical -.</em> Innocent customers being tracked feels disproportionate; misidentification could falsely accuse someone.<br>
+<em>Legal -.</em> Facial data is <strong>personal data</strong> under the <strong>Data Protection Act 2018</strong> — the centre must keep it secure, only use it for the stated purpose, not keep it longer than needed, and must inform customers (signs at entrances). Breach = ICO fine.<br>
+<em>Conclusion.</em> "On balance, the upgrade is justified <strong>only if</strong> the centre clearly informs customers, secures the data and deletes recordings after a fixed period in line with the DPA. Crime deterrence outweighs the privacy cost, provided legal compliance is maintained."<br>
+<strong>Exam evidence:</strong> Jun23/Q6 (8 marks). Jun23 ER warned candidates to discuss the UPGRADE, not CCTV in general.`
+  },
+  {
+    type: "8-mark",
+    spec: "cross",
+    front: `<strong>Jun25/Q3 (8 marks) — worked answer</strong><br>"A tablet company wants to <strong>reduce manufacturing costs</strong> and <strong>stop releasing software updates</strong> for older tablets, so customers change devices more often. Discuss the impact on company and customers. Include: ethical issues; environmental issues; benefits and drawbacks." [8]`,
+    back: `<strong>Band-3 model.</strong><br>
+<em>Ethical -.</em> Customers are being <strong>deceived</strong> if not told updates will stop. Stopping updates is "ethical to the company but unethical to the customers" — they bought a device expecting it to keep working. Vulnerable groups (elderly, low-income) are hit hardest.<br>
+<em>Ethical +.</em> Improved profit can pay staff more / fund new R&amp;D. A cheaper-to-make tablet may let more people afford a device, narrowing the <strong>digital divide</strong> for some.<br>
+<em>Environmental -.</em> Increase in <strong>e-waste</strong> from devices disposed of in landfill (often shipped to Africa/Asia); <strong>toxic waste</strong> released into land/groundwater/air; waste of precious metals; cheaper materials may mean less recyclable hardware.<br>
+<em>Environmental +.</em> Older devices could be <strong>distributed to people without devices</strong> to reduce waste; products could be <strong>recycled for components</strong>.<br>
+<em>Benefits/drawbacks — company.</em> + Increased sales and short-term profit. - Decreased reputation; long-term loss of customers to competitors with better update policies.<br>
+<em>Benefits/drawbacks — customer.</em> + Lower initial cost may let some buy a tablet for the first time. - Higher long-term cost (replacing more often); less reliable devices; time/effort installing replacements regularly; data-migration risk under <strong>DPA 2018</strong>.<br>
+<em>Conclusion.</em> "On balance, the strategy boosts short-term profit but the <strong>reputational and environmental cost</strong> outweighs it. The company should keep updates running for at least 5 years and run a recycling scheme."<br>
+<strong>Exam evidence:</strong> Jun25/Q3 (8 marks). MS indicative content: e-waste, recycling, deception, reputation, digital divide.`
+  },
+  {
+    type: "Scenario",
+    spec: "cross",
+    front: `<strong>Recognising the J277 spec from a scenario:</strong><br>"A Sky Q box contains a magnetic <strong>hard disk drive</strong> that records TV. After 2 years it is slow and is thrown out for a new model." List every J277/01 sub-topic this scenario could test.`,
+    back: `<strong>1.1.3 Embedded systems</strong> — set-top box has a dedicated CPU + firmware in ROM; cannot be reprogrammed by the user.<br>
+<strong>1.2.2 Secondary storage (magnetic HDD)</strong> — spinning platters + read/write head; cheap per GB, large capacity, fragile (moving parts).<br>
+<strong>1.5.2 Defragmentation utility</strong> — files get split across non-contiguous sectors as recordings are deleted, slowing reads. Defrag moves file fragments together and consolidates free space → <strong>fewer disc accesses</strong>. <em>Defrag is HDD-only — never run on SSD.</em><br>
+<strong>1.6 Environmental</strong> — disposed box adds to <strong>e-waste</strong>; rare-earth metals lost to landfill; could be recycled or donated.<br>
+<strong>1.4 (if data on it)</strong> — if account/viewing data is on the HDD, throwing it out without wiping is a <strong>DPA 2018</strong> breach (data not kept secure).<br>
+<strong>Exam evidence:</strong> SAMs/Q9 (4+3 marks) — restaurant computer with fragmented HDD; "files moved together / free space collected / fewer disc accesses". Jun24/Q5b (4 marks) — magnetic vs solid-state justification.`
+  },
+  {
+    type: "Scenario",
+    spec: "cross",
+    front: `<strong>Cloud-storage scenario:</strong><br>"Mum stores 8 years of family photos in iCloud and lets the iPhone auto-back-up over Wi-Fi." What J277/01 sub-topics does the exam test from this stem, and what's the headline answer for each?`,
+    back: `<strong>1.3.1 Cloud advantages/disadvantages</strong> — + access from any device, auto-backup, third party handles security/availability, no local hardware cost. - reliant on internet connection, vulnerable to hacking, data-ownership issues, may not be clear where in the world data is stored.<br>
+<strong>1.6 DPA 2018</strong> — Apple is a data controller; photos are personal data; "may not be clear where data is stored" engages DPA principle on transfers to countries with weaker protection.<br>
+<strong>1.2.5 Compression</strong> — photos uploaded as JPEG (<strong>lossy</strong>) to reduce file size / upload time / storage cost. Lossless (e.g. PNG) would keep every pixel but use far more storage.<br>
+<strong>1.4 Encryption</strong> — backup is encrypted in transit (HTTPS) and at rest in the cloud; if intercepted the photos are <strong>meaningless without the key</strong> (encryption does NOT prevent interception).<br>
+<strong>1.2.3 File size</strong> — image size = width x height x colour depth (bits). 4000 photos at ~3 MB each = 12 GB; iCloud free tier (5 GB) overflows → pay tier.<br>
+<strong>Exam evidence:</strong> SAMs/Q10b/c (4+4 marks, Cloud advantages/disadvantages, contextualised). Jun25/Q4d (5 marks, Cloud drawbacks for youth centre). Jun25/Q4f (4 marks, DPA + steps for storing user data).`
+  },
+  {
+    type: "Scenario",
+    spec: "cross",
+    front: `<strong>Phishing scenario:</strong><br>"Mum gets an email claiming to be from <strong>HMRC</strong> saying she's owed a 480 GBP tax rebate. The link goes to a fake login page." What threat is this, what defences apply, and which legislation covers the attacker?`,
+    back: `<strong>Threat (1.4):</strong> <strong>Phishing</strong> — a form of <strong>social engineering</strong>. The attacker masquerades as a trusted organisation to trick the victim into revealing credentials / bank details. Not malware itself, though the link may also deliver malware.<br>
+<strong>Defences (1.4):</strong><br>
+- <strong>User training</strong>: be suspicious of unsolicited "urgent" emails; check the sender domain; hover over links before clicking; HMRC never asks for bank details by email.<br>
+- <strong>Anti-malware / email filter</strong>: scans links and attachments, compares to a database of known phishing URLs, quarantines suspicious mail.<br>
+- <strong>Two-factor authentication</strong>: even if Mum types her password into the fake page, the attacker still can't log in to her real account without the second factor.<br>
+- <strong>Firewall</strong>: blocks connections to known malicious IPs if she clicks.<br>
+<strong>Legislation (1.6):</strong> The attacker breaches the <strong>Computer Misuse Act 1990</strong> — all three offences potentially apply: (1) unauthorised access (logging in as her), (2) unauthorised access <strong>with intent</strong> to commit a further offence (theft / fraud), (3) unauthorised modification (e.g. changing the password to lock her out).<br>
+<strong>Exam evidence:</strong> Jun23/Q4a (4-mark tick table: methods that prevent each threat) + Q4b (3-mark name + describe one other threat). Jun22/Q5b (6 marks, two software-based security methods).`
+  },
+  {
+    type: "8-mark",
+    spec: "cross",
+    front: `<strong>6-mark "describe THREE threats and how each is prevented"</strong><br>"A small business stores customer details on a networked computer. <strong>Describe three threats</strong> the business faces and <strong>how each can be prevented</strong>." [6]`,
+    back: `<strong>Model 6-mark answer</strong> (3 x 2 marks: name + mechanism + prevention).<br>
+<em>1. Malware (virus / ransomware).</em> Malicious software that infects, damages or encrypts files, often via email attachments or USB sticks. <strong>Prevent:</strong> install <strong>anti-malware</strong> that scans files, compares to a database of known malware and quarantines threats; keep it updated; take regular off-site <strong>backups</strong> so data can be restored without paying.<br>
+<em>2. Phishing / social engineering.</em> Attacker poses as a trusted source (e.g. bank, HMRC) to trick staff into revealing passwords. <strong>Prevent:</strong> <strong>user training</strong> — staff taught to check sender domains and never click unsolicited links; enable <strong>two-factor authentication</strong> so a stolen password is not enough.<br>
+<em>3. Brute-force attack.</em> Attacker tries millions of password combinations to gain unauthorised access. <strong>Prevent:</strong> enforce <strong>strong-password policy</strong> (length + mixed characters), <strong>account lockout</strong> after N failed attempts, and run authorised <strong>penetration testing</strong> to find weak passwords first.<br>
+<em>(Alternative threats accepted by MS: SQL injection / unpatched software / DoS / data interception — all need a matching defence.)</em><br>
+<strong>Exam evidence:</strong> SAMs/Q8a (6 marks, three ways hospital can protect network) + Q8b (6 marks, three staff errors + prevention). Jun22/Q5b (6 marks, two software-based security methods with description). Jun23/Q4a-b (7 marks total).`
+  },
+  {
+    type: "Scenario",
+    spec: "cross",
+    front: `<strong>Topology recommendation scenario:</strong><br>"A small business has <strong>4 PCs and a printer</strong> in one office. <strong>Recommend</strong> either a <strong>star</strong> or a <strong>mesh</strong> topology and <strong>justify</strong> your choice." [4]`,
+    back: `<strong>Recommendation: STAR topology.</strong><br>
+<em>Star structure.</em> One central <strong>switch</strong>; every PC and the printer connects directly to the switch with its own cable. The switch receives data, looks up the <strong>MAC address</strong> and sends data only to the destination (targeted — not broadcast).<br>
+<em>Justification (point + contextualisation):</em><br>
+- <strong>Cheaper</strong> than mesh — only 5 cables needed (one per device); a mesh of 5 devices needs 10 direct links → more cable + more network cards.<br>
+- <strong>Easy to add another PC</strong> — just plug into a spare switch port; no other devices affected.<br>
+- <strong>If one cable fails, only that device loses the network</strong> — the rest keep working.<br>
+- <strong>Centralised management</strong> — security and backups can be done at the switch / server.<br>
+<em>Mesh trade-off.</em> Mesh would survive multiple cable failures (redundant paths) but for 4 PCs in one room this resilience isn't worth the cost / cabling complexity. If the switch fails in star, the LAN is down — mitigate by keeping a spare switch.<br>
+<strong>Trap:</strong> star diagram must show ONE central device + spokes only — no extra cross-connections (that becomes mesh).<br>
+<strong>Exam evidence:</strong> SAMs/Q7c (2 marks, star reasons for bakery). Jun24/Q2c(i)-(iii) (8 marks total — draw star, star-vs-mesh benefit/drawback, switch role). Jun25/Q4b (6 marks total mesh + comparison).`
+  },
+  {
+    type: "8-mark",
+    spec: "cross",
+    front: `<strong>Predicted 8-mark stem (representative):</strong><br>"A doctor's surgery is replacing its <strong>paper-based</strong> patient-record system with a <strong>networked computer system</strong>. Discuss the impact of this change. Include: <strong>ethical</strong>, <strong>privacy</strong>, <strong>legal</strong> issues; benefits and drawbacks." [8]`,
+    back: `<strong>PEEL x 4 worked answer.</strong><br>
+<em>Define.</em> Patient records move from locked filing cabinets to a digital database accessed by GPs and nurses over the surgery LAN, with off-site backup.<br>
+<em>[Legal +].</em> Easier to comply with the <strong>Data Protection Act 2018</strong> — access can be logged, encrypted and restricted to authorised staff; subject-access requests can be fulfilled by exporting the record digitally rather than photocopying.<br>
+<em>[Ethical +].</em> Doctors can see allergies and prescriptions instantly across sites, reducing dangerous prescribing errors — direct patient-safety benefit.<br>
+<em>[Privacy +].</em> Access can be limited <strong>per role</strong> (receptionist vs GP vs consultant); audit trails show who viewed each record — paper had no such control.<br>
+<em>[Legal -].</em> A breach is now far more damaging — a hack could expose thousands of records at once. The surgery becomes a target for ransomware; this would be a CMA 1990 offence by the attacker (offence 2 — unauthorised access with intent) and a DPA 2018 breach by the surgery if data is not kept secure.<br>
+<em>[Ethical -].</em> Older / less digitally confident patients may feel their records are less private than in a filing cabinet they could see.<br>
+<em>[Privacy -].</em> Staff could access records of friends/family out of curiosity; needs strict access logs + training.<br>
+<em>Legislation in context.</em> Under DPA 2018 the surgery must encrypt records, train staff, only keep data while clinically needed, and notify the ICO + patients of any breach. Unauthorised staff snooping = <strong>CMA 1990 offence 1</strong>.<br>
+<em>Conclusion.</em> "The digital system is <strong>justified</strong> because the patient-safety and access-control gains outweigh the breach risk, <strong>provided</strong> the surgery encrypts data, enforces 2FA, trains staff and runs authorised penetration testing." Balanced + scenario-applied + recommendation = Band 3.<br>
+<strong>Exam evidence:</strong> Representative stem aligned with Jun23/Q6 (CCTV upgrade) and Jun25/Q3 (tech-impact) structures. Reuses MS phrasing on DPA steps (Jun25/Q4f) and CMA offences (SAMs/Q10d).`
+  },
+  {
+    type: "Misconception",
+    spec: "cross",
+    front: `<strong>8-mark mistakes that drop you from L3 to L2:</strong><br>Which five errors did Jun22/Jun23/Jun24 examiner reports specifically flag?`,
+    back: `<strong>1. One-sided answer.</strong> Listing only negatives ("AI is bad") caps at Band 2 (3-5 marks). MS requires balanced positive AND negative — Jun22 ER: "primarily negative, positive points limited".<br>
+<strong>2. Generic, not applied to the scenario.</strong> Jun22 ER: candidates "evolved into generic answers about AI in the world instead of focusing on the use of AI for monitoring posts." <strong>Fix:</strong> re-quote keywords from the stem ("this shopping centre", "facial recognition", "the tablet company") in every paragraph.<br>
+<strong>3. No recommendation when asked.</strong> Jun24 ER: "Fewer candidates included a recommendation… some suggested both were suitable and it was the programmer's decision, <strong>but the question asked for a recommendation</strong>." <strong>Fix:</strong> last sentence must say "I recommend X because Y".<br>
+<strong>4. Discussing the wrong thing.</strong> Jun23 ER: candidates discussed CCTV in general when the question asked about the <strong>upgrade to facial recognition</strong>. <strong>Fix:</strong> underline the NEW element in the stem.<br>
+<strong>5. Naming legislation without applying it.</strong> "The DPA applies" earns 0; "The DPA 2018 applies because facial data is personal data — the centre must keep it secure and only use it to identify offenders" earns the legal-bullet mark.<br>
+<strong>Bonus trap:</strong> writing prose blocks instead of headed/bulleted paragraphs. Jun22 & Jun23 ERs <strong>explicitly reward</strong> "stronger responses used headers and bullet points that clearly identified which issues were positive, negative, related to legal, ethical or privacy".<br>
+<strong>Exam evidence:</strong> Jun22/Q4 ER, Jun23/Q6 ER, Jun24/Q4 ER.`
+  },
+  {
+    type: "8-mark",
+    spec: "cross",
+    front: `<strong>SAMs/Q11 (8 marks) — worked answer</strong><br>"People often want to buy the most <strong>up-to-date smartphones</strong> even though their current phone still works. Discuss the impact. Consider: smartphone users; cultural issues; ethical issues; environmental issues." [8]`,
+    back: `<strong>Band-3 model.</strong><br>
+<em>[Users +].</em> Newer phones offer features users need for work/leisure (better camera, faster apps, accessibility tools); upgrading can improve productivity and quality of life.<br>
+<em>[Users -].</em> Constant upgrading is <strong>financially damaging</strong> — pushing low-income families into debt for a non-essential. Health: hours of screen time, addictive design.<br>
+<em>[Cultural +].</em> Owning a current device helps users <strong>fit in with peers</strong>, share photos/videos in current formats and stay socially connected.<br>
+<em>[Cultural -].</em> <strong>Bullying</strong> of those who can't afford the latest tech; widens the <strong>digital divide</strong> — those on old phones can't run new apps and feel excluded.<br>
+<em>[Ethical -].</em> <strong>Social pressure on parents</strong> to fund children's upgrades. Manufacturers are accused of <strong>planned obsolescence</strong> — "intentionally designing fragile phones so they need to be replaced more often". Personal/confidential data left on traded-in devices risks DPA breaches.<br>
+<em>[Ethical +].</em> Trade-in / refurbishment schemes give older devices a second life and let lower-income users access modern tech.<br>
+<em>[Environmental -].</em> Phones are "poorly designed for durability… hardware not upgradeable/replaceable". Disposal generates <strong>e-waste</strong>; devices end up in landfill "in this country and/or abroad, e.g. Africa and Asia"; <strong>toxic waste</strong> released into land, ground water, air; <strong>precious metals</strong> wasted.<br>
+<em>[Environmental +].</em> Older devices "could be distributed to people without devices to reduce waste"; "products could be recycled for components".<br>
+<em>Conclusion.</em> "On balance, the personal benefit of upgrading is real but outweighed by the cultural + environmental cost when upgrades happen yearly. Manufacturers should design for repairability and consumers should keep phones for at least 4 years."<br>
+<strong>Exam evidence:</strong> SAMs/Q11 (8 marks). Direct MS bullets: e-waste, landfill abroad, toxic waste, planned obsolescence, digital divide, social pressure, bullying.`
+  },
+// --- flashcards_cross_C.js ---
+{
+    type: "Command",
+    spec: "cross",
+    front: `What does <strong>describe</strong> mean vs <strong>explain</strong> on J277/01?`,
+    back: `<p><strong>Describe</strong> = state the features / what something <em>is</em> or <em>does</em>. Bullet-point style is fine; a list of facts can earn full marks.</p><p><strong>Explain</strong> = give the <em>reasons</em> / cause-and-effect. You <strong>must</strong> link points using words like <em>because</em>, <em>since</em>, <em>so</em>, <em>therefore</em>, <em>this means</em>.</p><p>Mark schemes: <em>describe</em> Qs accept lists of correct features; <em>explain</em> Qs require linked reasoning (point + because + consequence).</p><br><p><strong>Exam evidence:</strong> Jun24/Q2c(iii) (3 marks) — <em>"Describe the role of the switch"</em>: MS accepts bullet features. Jun22/Q3a(i) (3 marks) — <em>"Explain why the number of devices affects network performance"</em>: MS requires linked reasoning (more devices → bandwidth shared → slower).</p>`
+  },
+  {
+    type: "Command",
+    spec: "cross",
+    front: `What do <strong>state</strong> / <strong>give</strong> / <strong>identify</strong> mean?`,
+    back: `<p>These are <strong>minimum-effort</strong> command words — 1 mark each, no explanation needed. Just write the fact / name / item asked for.</p><p>Do <strong>NOT</strong> waste time writing reasons — the MS only accepts the single fact. Extra wrong material can <strong>cancel out</strong> a correct answer.</p><p>Format: a short phrase or one sentence is enough. If asked for "two", write two clearly separated items.</p><br><p><strong>Exam evidence:</strong> Jun24/Q5b(ii) (1 mark) — <em>"Identify one other type of secondary storage"</em> MS: <em>"Optical"</em> — single word earns the mark. SAMs/Q2b (3 marks) — <em>"Identify three common types of secondary storage"</em>: MS accepts <em>magnetic / optical / solid state</em>.</p>`
+  },
+  {
+    type: "Command",
+    spec: "cross",
+    front: `What does <strong>discuss</strong> mean on the 8-mark Q?`,
+    back: `<p><strong>Discuss</strong> = present <strong>both sides</strong> (positive AND negative / benefits AND drawbacks) <strong>plus a judgement / weighing-up</strong> at the end.</p><p>One-sided answers cap at <strong>Mark Band 2 (3–5 marks max)</strong>. To hit MB3 (6–8) you need balanced material applied to the scenario, plus a final conclusion / recommendation.</p><p>Use the <strong>PEEL × 4</strong> skeleton: <em>Privacy / Ethical / Environmental / Legal</em> — one positive AND one negative for each lens.</p><br><p><strong>Exam evidence:</strong> SAMs/Q11* (8 marks) <em>"Discuss the impact of people wanting to upgrade…"</em>; Jun22/Q4*, Jun23/Q6*, Jun24/Q4*, Jun25/Q3* — every 8-mark Q across all 5 papers uses <strong>discuss</strong>.</p>`
+  },
+  {
+    type: "Command",
+    spec: "cross",
+    front: `What does <strong>compare</strong> mean? And <strong>justify</strong>?`,
+    back: `<p><strong>Compare</strong> = give <strong>similarities AND differences</strong> between two things. A list of features of just one of them is <strong>not</strong> a compare answer.</p><p><strong>Justify</strong> = give a <strong>reason</strong> for your choice, <strong>linked to the scenario</strong>. Format: "<em>X is best because [feature] which means [scenario benefit]</em>".</p><br><p><strong>Exam evidence:</strong> Jun24/Q5b(i) (4 marks) — <em>"Identify and justify"</em> magnetic vs solid state for a laptop. MS requires identification + reason + scenario link. Jun25/Q1c (4 marks) — same structure for transferring files home.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "cross",
+    front: `<strong>Penetration testing</strong> — what's the ONE word that wins (or loses) the mark?`,
+    back: `<p style="font-size:1.6em; text-align:center; color:#E8B96A; margin:14px 0;"><strong>AUTHORISED</strong></p><p style="text-align:center;">(or "with permission" / "approved")</p><p>Without this word, the mark scheme treats the answer as describing illegal hacking — <strong>zero marks</strong>. With it, you bank the mark.</p><br><p><strong>Exam evidence:</strong> Across multiple papers — the MS bullet for pen-testing definitions <em>always</em> requires "authorised" or "with permission". A one-word recall drill — say it now.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "cross",
+    front: `<strong>CMA 1990</strong> — how many offences must you list?`,
+    back: `<p><strong>THREE</strong> offences. Mark schemes for "list the offences under the Computer Misuse Act" want all three:</p><p>1. <strong>Unauthorised access</strong> to computer material.<br>2. <strong>Unauthorised access with intent</strong> to commit a further offence.<br>3. <strong>Unauthorised modification</strong> of computer material.</p><p>Every offence starts with <strong>"unauthorised"</strong>. Don't write "hacking" — that's not the MS phrasing.</p><br><p><strong>Exam evidence:</strong> SAMs/Q10d (6 marks), Jun22/Q5c (5 marks), Jun25/Q4f (4 marks) — all reference CMA 1990 in legislation tick-tables. MS uses "unauthorised access / modification" phrasing.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "cross",
+    front: `Top 5 J277/01 <strong>classic traps</strong> — drill these in 60 seconds.`,
+    back: `<p>1. <strong>PC</strong> holds the <strong>NEXT</strong> instruction (not current).<br>2. <strong>Defragmentation</strong> = magnetic HDD only, <strong>NOT SSD</strong>.<br>3. <strong>Encryption</strong> does NOT stop interception — scrambles data so it is <strong>meaningless if intercepted</strong>.<br>4. <strong>DNS</strong> converts <strong>domain name → IP address</strong> (not "finds the website").<br>5. <strong>IPv4 range</strong> = <strong>0–255</strong>, NOT 1–256.</p><p>Bonus: <strong>Sound sampling</strong> measures <strong>amplitude</strong> (not frequency). <strong>CU coordinates</strong>, <strong>ALU executes</strong>.</p><br><p><strong>Exam evidence:</strong> Jun22/ER 3b (IPv4), Jun22/ER 3e (encryption), Jun22/ER 6a(i) (sampling = amplitude), Jun22/ER Q2 (CU vs ALU). All flagged as the most common lost-mark errors.</p>`
+  },
+  {
+    type: "Misconception",
+    spec: "cross",
+    front: `<strong>Folder management</strong> — accepted on the MS? And <strong>POP vs IMAP</strong>?`,
+    back: `<p><strong>Folder management — NO.</strong> MS uses <strong>file management</strong> (creating, naming, moving, deleting, opening files). "Folder management" alone is rejected; write <em>"file/folder management"</em> to be safe.</p><p><strong>POP vs IMAP:</strong></p><p>• <strong>POP</strong> = <strong>downloads</strong> email to device and (usually) <strong>deletes</strong> from the server.<br>• <strong>IMAP</strong> = <strong>keeps mail on the server</strong>, syncs across multiple devices.<br>• <strong>SMTP</strong> = <strong>sending</strong> email (outbox).</p><br><p><strong>Exam evidence:</strong> Jun24/Q3a (4 marks) — OS function table includes <em>"file management"</em>. Jun23/Q2a(i) (4 marks) — protocols table: POP/IMAP for receiving, SMTP for sending. Jun23/ER flags candidates writing SMTP for inbox check.</p>`
+  },
+  {
+    type: "Calc",
+    spec: "cross",
+    front: `<strong>Image file size</strong> — formula and unit chain.`,
+    back: `<p><strong>File size (bits) = width × height × colour depth</strong> (colour depth in bits).</p><p>Unit chain: <strong>bits → bytes → KB → MB</strong> by dividing by 8, then 1000, then 1000.</p><p>Worked example (Jun25/Q1b(ii)): 10 images, 800 × 500 pixels, 8-bit colour depth.<br>= 10 × 800 × 500 × 8 = 32,000,000 bits<br>÷ 8 = 4,000,000 bytes<br>÷ 1000 = <strong>4000 KB</strong>.</p><p><strong>Always show working</strong> — Jun22/23/24 ERs all penalise missing working.</p><br><p><strong>Exam evidence:</strong> Jun25/Q1b(ii) (2 marks) — MS: 1 mark working, 1 mark answer 4000 KB.</p>`
+  },
+  {
+    type: "Calc",
+    spec: "cross",
+    front: `<strong>Sound file size</strong> — formula and unit chain.`,
+    back: `<p><strong>File size (bits) = sample rate (Hz) × bit depth × duration (s)</strong>.</p><p>Unit chain: <strong>bits → bytes → KB → MB</strong> (÷ 8, then ÷ 1000, ÷ 1000).</p><p>Also memorise the <strong>effects</strong>:</p><p>• Higher <strong>sample rate</strong> → more accurate sound / closer to original → larger file.<br>• Higher <strong>bit depth</strong> → more unique amplitude values → better quality → larger file.<br>• Longer <strong>duration</strong> → larger file (linear).</p><br><p><strong>Exam evidence:</strong> Jun22/Q6a(ii) (3 marks) tick-table; Jun24/Q5a(ii) (2 marks) — <em>"explain the effect of changing bit depth"</em>: MS accepts <em>"more unique amplitude values can be stored / sound is more accurate / file size increases"</em>.</p>`
+  },
+  {
+    type: "Calc",
+    spec: "cross",
+    front: `<strong>Binary addition</strong> — carry rules and overflow.`,
+    back: `<p>Column-by-column, right-to-left:</p><p>• 0 + 0 = <strong>0</strong><br>• 0 + 1 = <strong>1</strong><br>• 1 + 1 = <strong>10</strong> (write 0, carry 1)<br>• 1 + 1 + 1 = <strong>11</strong> (write 1, carry 1)</p><p>Always <strong>show your carries</strong> above the sum line (this is the working mark). Answer must stay <strong>8 bits</strong>; if a 9th bit is produced, that's <strong>overflow</strong> — state it.</p><p><strong>Binary shift:</strong> left shift by n = <strong>× 2ⁿ</strong>; right shift by n = <strong>÷ 2ⁿ</strong>. Bits that fall off the end are <strong>lost (loss of precision)</strong>. No binary point.</p><br><p><strong>Exam evidence:</strong> Jun23/Q1e, Jun24/Q1e, Jun25/Q5c — all 2-mark binary additions (1 mark working, 1 mark answer). Jun24/Q1c — 4-place left shift on 00001111 → 11110000.</p>`
+  },
+  {
+    type: "Connection",
+    spec: "cross",
+    front: `Past-paper Q: <em>"Explain how more devices affect network performance."</em> (3 marks) — what is the examiner ACTUALLY asking?`,
+    back: `<p>The examiner wants a <strong>chain of reasoning</strong>, NOT just "the network is slower".</p><p>MS-shape answer:</p><p>• More devices means <strong>bandwidth is shared</strong> between more users <em>so</em> each device gets less.<br>• More devices means <strong>more data packets / collisions / contention</strong> for the same medium <em>therefore</em> latency increases.<br>• Network may become <strong>congested</strong>, causing <strong>slower transmission speeds / dropped packets</strong>.</p><p>Jun22 ER explicitly warns: <em>"answers were too vague — 'runs slower' on its own does not earn marks"</em>.</p><br><p><strong>Exam evidence:</strong> Jun22/Q3a(i) (3 marks). MS requires linked points: cause → mechanism → effect. Skeleton: <strong>bandwidth / collisions / congestion</strong>.</p>`
+  },
+  {
+    type: "Connection",
+    spec: "cross",
+    front: `Past-paper Q: <em>"What is the 8-mark Q on?"</em> — predict the topic and structure.`,
+    back: `<p><strong>Topic:</strong> Almost always <strong>1.6</strong> — ethical / legal / cultural / environmental impact of a technology scenario. <strong>100% of past 8-markers</strong> (SAMs, Jun22, Jun23, Jun24, Jun25) have been 1.6.</p><p><strong>Structure to hit MB3 (6–8):</strong></p><p>• <strong>Both sides</strong> — positive AND negative (one-sided caps at MB2).<br>• <strong>Apply to the scenario</strong> — generic "AI is bad" loses marks.<br>• <strong>Name an Act</strong> — DPA 2018 / CMA 1990 / CDPA 1988.<br>• <strong>Recommendation / conclusion</strong> at the end (especially if "make a recommendation" is asked).<br>• <strong>Use headers or bullets</strong> — ER praises this structure.</p><br><p><strong>Exam evidence:</strong> SAMs/Q11*, Jun22/Q4*, Jun23/Q6*, Jun24/Q4*, Jun25/Q3* — all 8 marks, all topic 1.6, all "Discuss" command word.</p>`
+  }
+];
+
+let currentFilter = 'ALL';
+let order = [];
+let currentIndex = 0;
+
+const $ = id => document.getElementById(id);
+const cardEl = $('card');
+const emptyEl = $('empty');
+
+function matchesFilter(card, f) {
+  if (f === 'ALL') return true;
+  if (f === 'cross') return card.spec.indexOf('+') !== -1 || card.spec === 'cross';
+  // f is '1.1', '1.2', etc.
+  // Match only single-topic specs, not cross (no '+'), starting with f.
+  if (card.spec.indexOf('+') !== -1) return false;
+  if (card.spec === 'cross') return false;
+  // Either exact match (e.g. '1.4', '1.6') or starts with 'f.' (e.g. '1.1.1')
+  return card.spec === f || card.spec.indexOf(f + '.') === 0;
+}
+
+function buildOrder() {
+  order = [];
+  for (let i = 0; i < cards.length; i++) {
+    if (matchesFilter(cards[i], currentFilter)) order.push(i);
+  }
+}
+
+function renderCard() {
+  if (order.length === 0) {
+    cardEl.style.display = 'none';
+    emptyEl.classList.add('visible');
+    $('counter').textContent = '0 / 0';
+    $('prev').disabled = true;
+    $('next').disabled = true;
+    return;
+  }
+
+  cardEl.style.display = '';
+  emptyEl.classList.remove('visible');
+
+  if (currentIndex >= order.length) currentIndex = 0;
+  if (currentIndex < 0) currentIndex = order.length - 1;
+
+  const card = cards[order[currentIndex]];
+  cardEl.classList.remove('flipped');
+
+  $('typeBadge').textContent = card.type.toUpperCase();
+  $('typeBadgeBack').textContent = card.type.toUpperCase();
+  $('specBadge').textContent = card.spec;
+  $('specBadgeBack').textContent = card.spec;
+
+  $('questionText').innerHTML = card.front;
+  $('answerText').innerHTML = card.back;
+
+  $('counter').textContent = (currentIndex + 1) + ' / ' + order.length;
+
+  $('prev').disabled = false;
+  $('next').disabled = false;
+
+  // Reset scroll on both faces
+  document.querySelectorAll('.face').forEach(f => f.scrollTop = 0);
+}
+
+function flip() {
+  if (order.length === 0) return;
+  cardEl.classList.toggle('flipped');
+}
+
+function next() {
+  if (order.length === 0) return;
+  currentIndex = (currentIndex + 1) % order.length;
+  renderCard();
+}
+
+function prev() {
+  if (order.length === 0) return;
+  currentIndex = (currentIndex - 1 + order.length) % order.length;
+  renderCard();
+}
+
+function shuffle() {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+  }
+  currentIndex = 0;
+  renderCard();
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === f);
+  });
+  buildOrder();
+  currentIndex = 0;
+  renderCard();
+}
+
+// Tap to flip (only on the card itself)
+cardEl.addEventListener('click', flip);
+
+$('next').addEventListener('click', (e) => { e.stopPropagation(); next(); });
+$('prev').addEventListener('click', (e) => { e.stopPropagation(); prev(); });
+$('shuffle').addEventListener('click', (e) => { e.stopPropagation(); shuffle(); });
+
+document.querySelectorAll('.filter').forEach(btn => {
+  btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+});
+
+$('resetFilter').addEventListener('click', () => setFilter('ALL'));
+
+// Swipe gestures
+let touchStartX = 0, touchStartY = 0, touchStartT = 0;
+const cardArea = $('cardArea');
+cardArea.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchStartT = Date.now();
+}, { passive: true });
+
+cardArea.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  const dt = Date.now() - touchStartT;
+  if (dt < 600 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx > 0) prev();
+    else next();
+  }
+}, { passive: true });
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') prev();
+  else if (e.key === 'ArrowRight') next();
+  else if (e.key === ' ' || e.key === 'f' || e.key === 'F') {
+    e.preventDefault();
+    flip();
+  } else if (e.key === 's' || e.key === 'S') {
+    shuffle();
+  }
+});
+
+// Init
+buildOrder();
+renderCard();
+</script>
+</body>
+</html>
