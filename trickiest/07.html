@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J277/01 Trickiest — Rank 7 — SAMs Q11*</title>
+<style>
+  :root {
+    --ink: #003366;
+    --ink-soft: #1c4a78;
+    --accent: #d68910;
+    --danger: #c0392b;
+    --success: #2c8a3d;
+    --bg: #ffffff;
+    --bg-soft: #f7f9fc;
+    --border: #d8e0eb;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    font-size: 16px;
+  }
+
+  /* Layout */
+  .wrap {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 32px 24px 80px 24px;
+  }
+
+  /* Side nav */
+  .sidenav {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    width: 56px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    background: rgba(255,255,255,0.96);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 6px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,51,102,0.08);
+    font-size: 12px;
+  }
+  .sidenav ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: navrank;
+  }
+  .sidenav li { margin: 0; }
+  .sidenav a {
+    display: block;
+    text-align: center;
+    padding: 4px 0;
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .sidenav a:hover { background: var(--ink); color: #fff; }
+  .sidenav .nav-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  @media (max-width: 1100px) {
+    .sidenav { display: none; }
+  }
+
+  /* Cover */
+  .cover {
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  .cover h1 {
+    font-size: 28px;
+    margin: 0 0 6px 0;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .cover .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin: 0 0 18px 0;
+    font-style: italic;
+  }
+  .cover .methodology {
+    background: var(--bg-soft);
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 0 0 20px 0;
+    font-size: 14.5px;
+  }
+  .cover .methodology p { margin: 0 0 6px 0; }
+  .cover .methodology p:last-child { margin-bottom: 0; }
+  .badge-inferred {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    vertical-align: middle;
+  }
+
+  /* Summary table */
+  .summary {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 32px 0;
+    font-size: 13.5px;
+  }
+  .summary th, .summary td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .summary th {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .summary tr:nth-child(even) td { background: var(--bg-soft); }
+  .summary td.rank-cell {
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+    width: 44px;
+  }
+  .summary td.marks-cell { text-align: center; width: 56px; }
+  .summary a { color: var(--ink); text-decoration: none; }
+  .summary a:hover { text-decoration: underline; }
+
+  /* Question card */
+  .q-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    margin: 0 0 32px 0;
+    background: #fff;
+    overflow: hidden;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    box-shadow: 0 1px 3px rgba(0,51,102,0.04);
+  }
+
+  .q-head {
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    font-size: 13.5px;
+  }
+  .q-head .rank {
+    font-size: 18px;
+    font-weight: 800;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 4px;
+  }
+  .q-head .paper {
+    font-weight: 700;
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .q-head .qid {
+    font-weight: 700;
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .q-head .marks {
+    font-weight: 600;
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .q-head .topic {
+    font-style: italic;
+    color: #e6eef7;
+    flex: 1 1 auto;
+    text-align: right;
+    font-size: 12.5px;
+  }
+  .q-head .inferred-tag {
+    background: var(--accent);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .q-card .block { padding: 14px 18px 4px 18px; }
+  .q-card .block h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 4px 0 8px 0;
+    font-weight: 700;
+  }
+  .q-card .block + .block { padding-top: 6px; }
+
+  /* Coloured section headers */
+  .q-block { border-top: 1px solid var(--border); }
+  .q-block h3 { color: var(--ink); }
+  .q-block h3::before { content: "Question — "; color: var(--ink); }
+  .q-block h3 { content: none; }
+  .q-block h3 { color: var(--ink); }
+
+  .why-tricky { background: #fcf2f0; border-top: 1px solid #f0d2cd; }
+  .why-tricky h3 { color: var(--danger); }
+
+  .model-answer { background: #f1faf3; border-top: 1px solid #cfe7d4; }
+  .model-answer h3 { color: var(--success); }
+
+  .watch-out { background: #fdf6e7; border-top: 1px solid #f1deb0; }
+  .watch-out h3 { color: #a36408; }
+
+  /* Bottom rounded fill for final block in card */
+  .q-card .block:last-child { padding-bottom: 14px; }
+
+  /* Content within blocks */
+  .q-text {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--ink);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 14.5px;
+  }
+  .q-text p { margin: 0 0 8px 0; }
+  .q-text p:last-child { margin-bottom: 0; }
+  .q-text ul { margin: 4px 0 8px 22px; padding: 0; }
+  .q-text li { margin: 2px 0; }
+  .q-text .marks-tag {
+    display: inline-block;
+    background: var(--ink);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-left: 4px;
+  }
+  .qstem-tag {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  /* Cloze gap visual */
+  .gap {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--ink);
+    margin: 0 4px;
+    padding: 0 4px;
+    vertical-align: baseline;
+    color: transparent;
+  }
+  .gap-num {
+    display: inline-block;
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .gap-filled {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--success);
+    padding: 0 6px;
+    font-weight: 700;
+    color: var(--success);
+    background: #eaf6ec;
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* Word bank */
+  .wordbank {
+    background: #f4f7fb;
+    border: 1px dashed var(--ink-soft);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--ink);
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
+  /* Tables inside question / answer */
+  table.qtable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 14px;
+  }
+  table.qtable th, table.qtable td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  table.qtable th {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+  }
+  table.qtable td.empty { background: #fff; min-height: 26px; }
+  table.qtable td.tick { text-align: center; width: 28px; }
+  table.qtable td.correct { color: var(--success); font-weight: 700; text-align: center; background: #eaf6ec; }
+  table.qtable td.partial { color: var(--ink-soft); text-align: center; font-style: italic; }
+  table.qtable td.filled { color: var(--success); font-weight: 700; background: #eaf6ec; }
+
+  pre.code-block {
+    background: #f4f7fb;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    overflow-x: auto;
+  }
+
+  /* Why tricky body */
+  .why-body, .watch-body { font-size: 14.5px; }
+  .er-quote {
+    font-style: italic;
+    border-left: 3px solid var(--danger);
+    padding: 6px 12px;
+    margin: 6px 0;
+    background: rgba(192, 57, 43, 0.05);
+    font-size: 14px;
+  }
+  .er-quote::before { content: "\201C"; font-weight: 700; }
+  .er-quote::after { content: "\201D"; font-weight: 700; }
+  .er-source {
+    display: block;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .ms-note {
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 13.5px;
+  }
+  .ms-note strong { color: var(--danger); }
+  .inferred-note {
+    background: #fff8eb;
+    border: 1px solid #f1deb0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .inferred-note strong { color: var(--accent); }
+
+  /* Model answer */
+  .answer-text {
+    background: #fff;
+    border: 1px solid #cfe7d4;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 14.5px;
+  }
+  .answer-text p { margin: 0 0 8px 0; }
+  .answer-text p:last-child { margin-bottom: 0; }
+  .answer-text strong { color: var(--ink); background: #fff7df; padding: 0 2px; border-radius: 2px; }
+  .answer-text em { font-style: italic; }
+  .answer-text ol, .answer-text ul { margin: 4px 0 8px 22px; padding: 0; }
+  .answer-text li { margin: 4px 0; }
+
+  .mark-allocation {
+    background: #fff;
+    border: 1px solid #cfe7d4;
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 13.5px;
+  }
+  .mark-allocation .ma-title {
+    font-weight: 700;
+    color: var(--success);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .mark-allocation ul { margin: 0 0 0 18px; padding: 0; }
+  .mark-allocation li { margin: 2px 0; }
+  .mark-allocation strong { color: var(--ink); }
+
+  .watch-body { font-size: 14px; }
+  .watch-body strong { color: #a36408; }
+
+  /* Footer */
+  footer {
+    border-top: 2px solid var(--ink);
+    margin-top: 32px;
+    padding-top: 16px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  footer p { margin: 4px 0; }
+
+  /* Print */
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    body { font-size: 11pt; }
+    .sidenav { display: none; }
+    .q-card { page-break-inside: avoid; box-shadow: none; }
+    .cover { page-break-after: always; }
+    .wrap { padding: 0; max-width: 100%; }
+  }
+</style>
+
+<style>
+  /* per-page footer nav */
+  footer.page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-top: 2px solid var(--ink);
+    margin-top: 32px;
+    padding: 14px 0 8px 0;
+    font-size: 14px;
+  }
+  footer.page-nav a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 700;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-soft);
+  }
+  footer.page-nav a:hover {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  footer.page-nav .disabled {
+    color: var(--ink-soft);
+    background: transparent;
+    border-color: transparent;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+  footer.page-nav .all-link {
+    flex: 0 0 auto;
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<section class="q-card" id="rank-7">
+  <header class="q-head">
+    <span class="rank">#7</span>
+    <span class="paper">SAMs</span>
+    <span class="qid">Q11*</span>
+    <span class="marks">8 marks (banded QWC)</span>
+    <span class="topic">1.6 ethical/cultural/environmental &mdash; smartphone upgrades</span>
+    <span class="inferred-tag">Inferred</span>
+  </header>
+
+  <div class="block q-block">
+    <h3>Question</h3>
+    <div class="q-text">
+      <p><strong>11*</strong> People often want to buy the most up-to-date smartphones, even though the smartphone they own still works.</p>
+      <p>Discuss the impact of people wanting to upgrade to the latest smartphone.</p>
+      <p>In your answer, you might consider the impact on:</p>
+      <ul>
+        <li>smartphone users</li>
+        <li>cultural issues</li>
+        <li>ethical issues</li>
+        <li>environmental issues.</li>
+      </ul>
+      <p><span class="marks-tag">[8]</span></p>
+    </div>
+  </div>
+
+  <div class="block why-tricky">
+    <h3>Why this question is tricky</h3>
+    <div class="why-body">
+      <div class="inferred-note"><strong>INFERRED &mdash; SAMs predates live sittings, no examiner report exists.</strong> Pure structural mirror of the live banded Qs.</div>
+      <div class="ms-note">MS complexity <strong>10/10</strong>: Banded L1/L2/L3. Band 3 requires reference to <strong>all areas</strong> (users, cultural, ethical, environmental). Overlap between ethical and environmental (e-waste fits both) &mdash; spread points, don't double-count.</div>
+    </div>
+  </div>
+
+  <div class="block model-answer">
+    <h3>Full-marks model answer</h3>
+    <div class="answer-text">
+      <p>Smartphone upgrade culture has a significant impact across users, culture, ethics and the environment. This response considers all four areas.</p>
+      <p><strong>Smartphone users</strong> are affected in several ways. Constant upgrading has <strong>health issues</strong> (screen time, addiction), it is <strong>financially costly</strong> because of the high cost of new devices, and it has <strong>social and cultural pressures</strong>. Customers may also feel that owning the latest model gives them access to new features they require for work or leisure, which is a genuine benefit.</p>
+      <p><strong>Culturally</strong>, there is a strong desire or need to own the newest device, often to <strong>fit in with peers</strong>. New phones may have features that users genuinely need &mdash; improved cameras, accessibility features, or faster processing &mdash; and this drives a cycle of upgrading that is now part of mainstream culture in many countries.</p>
+      <p><strong>Ethically</strong>, the upgrade cycle contributes to ill health and to the <strong>digital divide</strong> between those who can afford the latest device and those who cannot. It contributes to social division and can lead to bullying of those who cannot afford the latest technology. There is also the ethical problem of <strong>confidential data</strong> stored on devices that are then discarded. A serious concern is that phone manufacturers may intentionally design fragile phones so they need to be replaced more often (<strong>planned obsolescence</strong>). Counter-balancing this, the high cost of new devices means many people keep older phones for longer, and second-hand markets exist that allow buyers on lower budgets to get a working device.</p>
+      <p><strong>Environmentally</strong>, the impact is severe. There is the type of devices being disposed of, the fact that modern phones are poorly designed for durability, and that phones' hardware is not upgradeable or replaceable. The result is large amounts of <strong>e-waste</strong> &mdash; people dispose of devices in landfill even if they are in good working order. Some equipment is also sent abroad to be disposed of, leading to <strong>excessive landfill</strong> (for example in Africa and Asia). <strong>Toxic waste</strong> is released into land, ground water and air, and there is a waste of <strong>precious metals</strong> contained in the phones.</p>
+      <p><strong>Conclusion.</strong> The cultural pressure to upgrade smartphones produces clear personal benefits (new features, social belonging) but at a serious ethical and environmental cost &mdash; e-waste, digital divide and planned obsolescence. Consumers should be encouraged to keep devices for longer, manufacturers should be required to provide upgradeable hardware and software support, and recycling schemes should be improved. The user benefits do not outweigh the long-term environmental damage if the current cycle continues unchecked.</p>
+    </div>
+    <div class="mark-allocation">
+      <div class="ma-title">Mark allocation (Band 3, 7&ndash;8 marks)</div>
+      <ul>
+        <li>Each of the <strong>four areas</strong> named in the question gets its own paragraph &mdash; Band 3 descriptor: "reference to the impact on all areas".</li>
+        <li>Users: health, financial, social/cultural pressure &mdash; MS: "Can adversely affect people in this country and abroad: health issues / financially / socially / culturally".</li>
+        <li>Cultural: desire to own newest device, peer pressure, features needed for work/leisure.</li>
+        <li>Ethical: digital divide, bullying, confidential data, planned obsolescence &mdash; MS: "Contributes to ill health / digital divide / social divide / confidential data on discarded devices / phone manufacturers intentionally designing fragile phones".</li>
+        <li>Environmental: e-waste, landfill abroad, toxic waste, precious metals &mdash; MS exact: "Reference to e-waste / excessive landfill (Africa and Asia) / Toxic waste released into land, ground water, air / Precious metals in phones".</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block watch-out">
+    <h3>Watch out for...</h3>
+    <div class="watch-body">
+      <p><strong>MS-derived only &mdash; no examiner-report guidance.</strong> The MS lists ~20 indicative points across four areas. Band 3 requires <strong>breadth across all four areas</strong>, not depth in just one. E-waste fits both ethical and environmental &mdash; use it once, spread other points across the areas to demonstrate breadth.</p>
+    </div>
+  </div>
+</section>
+<footer class="page-nav">
+  <a href="06.html">&larr; Prev</a>
+  <a class="all-link" href="index.html">All 21</a>
+  <a href="08.html">Next &rarr;</a>
+</footer>
+</div>
+</body>
+</html>
